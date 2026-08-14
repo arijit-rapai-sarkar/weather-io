@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WeatherIQ — AI-powered weather intelligence platform with real-time IoT sensors, machine learning predictions, anomaly detection, and smart alerts. Monitor temperature, humidity, AQI, UV, wind, and more." />
+  <meta name="theme-color" content="#3B82F6" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="WeatherIQ" />
+  <meta property="og:title" content="WeatherIQ — AI + IoT Weather Intelligence" />
+  <meta property="og:description" content="Local weather intelligence with real-time IoT sensors and AI predictions." />
+  <title>WeatherIQ — AI + IoT Weather Intelligence Platform</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+<!-- Dynamic Weather Background -->
+<div class="weather-bg" id="weather-bg" aria-hidden="true"></div>
+
+<!-- Demo Mode Banner -->
+<div class="demo-banner hidden" id="demo-banner">
+  <div class="demo-banner-left">
+    <span>🎭</span>
+    <span class="demo-banner-title">DEMO MODE</span>
+    <span class="demo-banner-desc" id="demo-scenario-label">Rain Event Simulation</span>
+  </div>
+  <button class="demo-banner-close" id="demo-banner-close">Exit Demo</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SIDEBAR OVERLAY (mobile / tablet)
+════════════════════════════════════════════════════════════════ -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SIDEBAR — Desktop persistent navigation
+════════════════════════════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+  <div class="sidebar-brand">
+    <div class="brand-icon" aria-hidden="true">🌦️</div>
+    <span class="brand-name">WeatherIQ</span>
+  </div>
+
+  <nav class="sidebar-nav" aria-label="Sidebar navigation">
+    <!-- Main -->
+    <div class="nav-section-label">Main</div>
+    <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard">
+      <i data-lucide="layout-dashboard"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="#" class="nav-item" data-page="sensors" id="nav-sensors">
+      <i data-lucide="activity"></i>
+      <span>Live Sensors</span>
+    </a>
+    <a href="#" class="nav-item" data-page="map" id="nav-map">
+      <i data-lucide="map"></i>
+      <span>Weather Map</span>
+    </a>
+    <a href="#" class="nav-item" data-page="analytics" id="nav-analytics">
+      <i data-lucide="bar-chart-2"></i>
+      <span>Analytics</span>
+    </a>
+
+    <!-- Forecast & Intelligence -->
+    <div class="nav-section-label">Intelligence</div>
+    <a href="#" class="nav-item" data-page="ai" id="nav-ai">
+      <i data-lucide="sparkles"></i>
+      <span>AI Prediction</span>
+    </a>
+    <a href="#" class="nav-item" data-page="ailab" id="nav-ailab">
+      <i data-lucide="flask-conical"></i>
+      <span>AI Lab</span>
+    </a>
+    <a href="#" class="nav-item" data-page="forecast" id="nav-forecast">
+      <i data-lucide="calendar-days"></i>
+      <span>Forecast</span>
+    </a>
+    <a href="#" class="nav-item" data-page="intelligence" id="nav-intelligence">
+      <i data-lucide="lightbulb"></i>
+      <span>Intelligence</span>
+    </a>
+
+    <!-- Locations -->
+    <div class="nav-section-label">Locations</div>
+    <a href="#" class="nav-item" data-page="search" id="nav-search">
+      <i data-lucide="search"></i>
+      <span>Search</span>
+    </a>
+    <a href="#" class="nav-item" data-page="saved" id="nav-saved">
+      <i data-lucide="bookmark"></i>
+      <span>Saved Locations</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a href="#" class="nav-item" data-page="settings" id="nav-settings">
+      <i data-lucide="settings"></i>
+      <span>Settings</span>
+    </a>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════════
+     NOTIFICATION PANEL (slide-out)
+════════════════════════════════════════════════════════════════ -->
+<div class="notif-panel" id="notif-panel" role="dialog" aria-label="Notifications" aria-modal="false">
+  <div class="notif-panel-header">
+    <h3>🔔 Notifications</h3>
+    <div class="notif-actions">
+      <button class="btn-text" id="notif-mark-all" style="font-size:0.75rem;color:var(--primary)">Mark all read</button>
+      <button class="icon-btn" id="notif-close" aria-label="Close notifications">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+  </div>
+  <div class="notif-filter-row" id="notif-filter-row">
+    <button class="notif-filter-btn active" data-filter="all">All</button>
+    <button class="notif-filter-btn" data-filter="weather">🌦 Weather</button>
+    <button class="notif-filter-btn" data-filter="iot">📡 IoT</button>
+    <button class="notif-filter-btn" data-filter="ai">🤖 AI</button>
+    <button class="notif-filter-btn" data-filter="safety">⚠️ Safety</button>
+  </div>
+  <div class="notif-list" id="notif-list" role="list" aria-label="Notification list"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN APP WRAPPER
+════════════════════════════════════════════════════════════════ -->
+<div class="app-wrapper" id="app-wrapper">
+
+  <!-- ── Topbar ─────────────────────────────────────────────── -->
+  <header class="topbar" id="topbar" role="banner">
+    <div class="topbar-left">
+      <button class="sidebar-toggle icon-btn" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
+        <i data-lucide="menu"></i>
+      </button>
+      <div class="topbar-brand" aria-hidden="true">WeatherIQ</div>
+    </div>
+
+    <div class="topbar-center">
+      <div class="search-bar" id="topbar-search-bar" role="search">
+        <i data-lucide="search" aria-hidden="true"></i>
+        <input
+          type="text"
+          id="topbar-search-input"
+          placeholder="Search city or location…"
+          autocomplete="off"
+          aria-label="Search city or location"
+          aria-controls="topbar-search-dropdown"
+          aria-autocomplete="list"
+        />
+        <div class="search-dropdown" id="topbar-search-dropdown" role="listbox" aria-label="Search suggestions"></div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <!-- Last updated -->
+      <div class="last-updated-chip live" id="last-updated-chip" style="display:none">
+        <span class="live-dot"></span>
+        <span id="last-updated-text">Just now</span>
+      </div>
+
+      <button class="icon-btn" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <i data-lucide="moon" id="theme-icon"></i>
+      </button>
+      <button class="icon-btn notification-btn" id="notification-btn" aria-label="Notifications" style="position:relative">
+        <i data-lucide="bell"></i>
+        <span class="notif-dot" id="notif-dot" aria-hidden="true"></span>
+        <span class="notif-unread-badge" id="notif-unread-badge" style="display:none"></span>
+      </button>
+      <div class="profile-avatar" id="profile-avatar" role="button" tabindex="0" aria-label="User profile">U</div>
+    </div>
+  </header>
+
+  <!-- ── Page content ───────────────────────────────────────── -->
+  <main class="page-content" id="page-content" role="main">
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: DASHBOARD
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page active" id="page-dashboard" role="region" aria-label="Dashboard">
+
+      <!-- Offline banner -->
+      <div class="offline-banner hidden" id="offline-banner">
+        <span class="offline-icon">📡</span>
+        <div class="offline-text">
+          <div class="offline-title">You are offline</div>
+          <div class="offline-sub">Showing last cached data. Reconnecting…</div>
+        </div>
+        <span class="reconnecting-label" id="reconnecting-label">Offline</span>
+      </div>
+
+      <!-- Location + IoT status -->
+      <div class="location-header" id="location-header">
+        <div class="location-info">
+          <i data-lucide="map-pin" aria-hidden="true"></i>
+          <div>
+            <span class="location-city" id="location-city">—</span>
+            <span class="location-detail" id="location-detail"></span>
+          </div>
+          <button class="location-refresh" id="location-refresh" title="Refresh location" aria-label="Refresh location">
+            <i data-lucide="refresh-cw"></i>
+          </button>
+        </div>
+        <div class="iot-status-bar" id="iot-status-bar" aria-live="polite">
+          <span class="iot-dot" id="iot-dot"></span>
+          <span class="iot-status-text" id="iot-status-text">Connecting…</span>
+          <span class="iot-update-time" id="iot-update-time"></span>
+        </div>
+      </div>
+
+      <!-- Weather hero row (Current + AI) -->
+      <div class="weather-hero-row">
+
+        <!-- Current weather (IoT) -->
+        <div class="card current-weather-card anim-fade-up" id="current-weather-card" aria-label="Current weather from IoT sensor">
+          <!-- Skeleton state -->
+          <div id="cw-skeleton" class="cw-skeleton-wrap">
+            <div class="skeleton skel-block" style="height:200px"></div>
+          </div>
+          <!-- Content -->
+          <div id="cw-content" hidden>
+            <div class="cw-header">
+              <span class="badge badge-iot" aria-label="Live IoT sensor data">● LIVE IoT</span>
+              <span class="cw-condition" id="cw-condition"></span>
+            </div>
+            <div class="cw-temp-row">
+              <span class="cw-icon" id="cw-icon" aria-hidden="true"></span>
+              <span class="cw-temp" id="cw-temp"></span>
+              <span class="cw-unit">°C</span>
+            </div>
+            <div class="cw-feels">
+              <span>Feels like <strong id="cw-feels"></strong></span>
+              <span class="cw-humidity">
+                <i data-lucide="droplets" aria-hidden="true"></i>
+                <span id="cw-humidity"></span>
+              </span>
+            </div>
+            <div class="cw-meta">
+              <div class="cw-meta-item">
+                <i data-lucide="wind" aria-hidden="true"></i>
+                <span id="cw-wind"></span>
+              </div>
+              <div class="cw-meta-item">
+                <i data-lucide="eye" aria-hidden="true"></i>
+                <span id="cw-vis"></span>
+              </div>
+              <div class="cw-meta-item">
+                <i data-lucide="gauge" aria-hidden="true"></i>
+                <span id="cw-pressure"></span>
+              </div>
+            </div>
+            <!-- NEW: Conditions summary grid -->
+            <div class="conditions-summary" id="conditions-summary" style="margin-top:14px"></div>
+          </div>
+          <!-- Error/Offline state -->
+          <div id="cw-error" hidden class="state-card">
+            <div class="state-icon">📡</div>
+            <div class="state-title">IoT Device Offline</div>
+            <div class="state-msg">Showing last available reading</div>
+          </div>
+        </div>
+
+        <!-- AI Prediction -->
+        <div class="card ai-prediction-card anim-fade-up anim-delay-1" id="ai-prediction-card" aria-label="AI weather prediction">
+          <!-- Skeleton -->
+          <div id="ai-skeleton">
+            <div class="skeleton skel-block" style="height:200px"></div>
+          </div>
+          <!-- Content -->
+          <div id="ai-content" hidden>
+            <div class="ai-header">
+              <div>
+                <span class="badge badge-ai" aria-label="AI predicted data">⬡ AI PREDICTED</span>
+                <h3 style="margin-top:6px">Next 6 Hours</h3>
+              </div>
+              <div class="ai-confidence" id="ai-confidence"></div>
+            </div>
+            <div class="ai-timeline" id="ai-timeline" role="list" aria-label="Hourly AI predictions"></div>
+            <div class="ai-summary" id="ai-summary"></div>
+          </div>
+          <!-- Error -->
+          <div id="ai-error" hidden class="state-card">
+            <div class="state-icon">🤖</div>
+            <div class="state-title">Prediction Unavailable</div>
+            <div class="state-msg">AI prediction is temporarily unavailable</div>
+          </div>
+        </div>
+
+      </div><!-- /weather-hero-row -->
+
+      <!-- NEW: Weather Score + Activity Scores -->
+      <div class="bottom-row anim-fade-up" style="margin-bottom:20px" id="score-row">
+        <!-- Weather Score -->
+        <div class="card" id="weather-score-card">
+          <div class="section-header">
+            <h3>Weather Score</h3>
+            <span class="badge badge-iot">● LIVE IoT</span>
+          </div>
+          <div id="weather-score-content" class="weather-score-card">
+            <div class="skeleton skel-block" style="height:120px;width:100%"></div>
+          </div>
+        </div>
+        <!-- Activity Scores -->
+        <div class="card" id="activity-score-card">
+          <div class="section-header">
+            <h3>Outdoor Activity Scores</h3>
+            <span class="badge badge-iot">● LIVE IoT</span>
+          </div>
+          <div class="activity-grid" id="activity-grid">
+            <div class="skeleton skel-block" style="height:120px;width:100%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW: Weather Timeline -->
+      <div class="card anim-fade-up" style="margin-bottom:20px" id="timeline-card">
+        <div class="section-header">
+          <h3>Weather Timeline</h3>
+          <span class="badge badge-ai">⬡ AI PREDICTED</span>
+        </div>
+        <div class="weather-timeline" id="weather-timeline" role="list" aria-label="6-hour weather timeline"></div>
+      </div>
+
+      <!-- NEW: Sunrise / Sunset -->
+      <div class="card anim-fade-up" style="margin-bottom:20px" id="sun-card">
+        <div class="section-header">
+          <h3>☀️ Sunrise & Sunset</h3>
+        </div>
+        <div class="sun-widget" id="sun-widget">
+          <div class="skeleton skel-block" style="height:60px;width:100%"></div>
+        </div>
+      </div>
+
+      <!-- Live sensor section -->
+      <div class="sensor-section anim-fade-up anim-delay-2">
+        <div class="section-header">
+          <h2>Live Environmental Data</h2>
+          <span class="badge badge-iot">● LIVE IoT</span>
+        </div>
+        <div class="sensor-grid" id="sensor-grid" role="list" aria-label="Live sensor readings">
+          <!-- Skeleton cards -->
+          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
+          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
+          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
+          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
+          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
+          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
+          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
+          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
+        </div>
+      </div>
+
+      <!-- Hourly forecast -->
+      <div class="card hourly-section anim-fade-up anim-delay-3" id="hourly-section">
+        <div class="section-header">
+          <h3>Hourly Forecast</h3>
+          <span class="badge badge-ai">⬡ AI PREDICTED</span>
+        </div>
+        <div class="hourly-scroll" id="hourly-scroll" role="list" aria-label="Hourly forecast">
+          <div class="skeleton skel-block" style="height:100px;width:100%"></div>
+        </div>
+      </div>
+
+      <!-- 7-day + Intelligence -->
+      <div class="bottom-row anim-fade-up anim-delay-4">
+
+        <!-- 7-Day forecast -->
+        <div class="card seven-day-card" id="seven-day-card">
+          <div class="section-header">
+            <h3>7-Day Forecast</h3>
+            <span class="badge badge-ai">⬡ AI PREDICTED</span>
+          </div>
+          <div class="seven-day-list" id="seven-day-list" role="list" aria-label="7-day forecast">
+            <div class="skeleton skel-block" style="height:220px"></div>
+          </div>
+        </div>
+
+        <!-- Intelligence / Recommendations -->
+        <div class="card intelligence-card" id="intelligence-card">
+          <div class="section-header">
+            <h3>Weather Intelligence</h3>
+          </div>
+          <div class="reco-list" id="reco-list" role="list" aria-label="Weather recommendations">
+            <div class="skeleton skel-block" style="height:100px"></div>
+          </div>
+          <div class="do-dont" id="do-dont-wrap"></div>
+        </div>
+
+      </div><!-- /bottom-row -->
+
+      <!-- Safety alerts -->
+      <div class="safety-section anim-fade-up anim-delay-5" id="safety-section">
+        <div class="section-header">
+          <h2>Safety Alerts</h2>
+        </div>
+        <div class="safety-alerts" id="safety-alerts" role="region" aria-live="polite" aria-label="Safety alerts">
+          <div class="skeleton skel-block" style="height:60px"></div>
+        </div>
+      </div>
+
+    </div><!-- /page-dashboard -->
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: LIVE SENSORS
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-sensors" role="region" aria-label="Live sensors">
+      <div class="page-header">
+        <h1>Live Sensors</h1>
+        <span class="badge badge-iot">● LIVE IoT</span>
+      </div>
+
+      <!-- NEW: IoT Device Health -->
+      <div class="card" style="margin-bottom:20px" id="device-health-card">
+        <div class="section-header">
+          <h3>Device Health</h3>
+          <span id="device-status-badge" class="model-status-badge healthy">● Healthy</span>
+        </div>
+        <div id="device-health-content">
+          <div class="skeleton skel-block" style="height:120px"></div>
+        </div>
+      </div>
+
+      <!-- NEW: Anomaly Detection -->
+      <div class="card" style="margin-bottom:20px" id="anomaly-card">
+        <div class="section-header">
+          <h3>🔍 Anomaly Detection</h3>
+          <span class="badge badge-iot">● LIVE IoT</span>
+        </div>
+        <div id="anomaly-content">
+          <div class="skeleton skel-block" style="height:80px"></div>
+        </div>
+      </div>
+
+      <!-- Detailed sensors -->
+      <div class="section-header" style="margin-bottom:12px">
+        <h2>All Sensors</h2>
+      </div>
+      <div class="sensor-grid detailed" id="sensor-grid-detailed" role="list" aria-label="Detailed sensor readings"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: WEATHER MAP
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-map" role="region" aria-label="Weather map">
+      <div class="page-header">
+        <h1>Weather Map</h1>
+      </div>
+      <div class="map-layer-controls">
+        <button class="map-layer-btn active" data-layer="station">📡 IoT Station</button>
+        <button class="map-layer-btn" data-layer="temperature">🌡️ Temperature</button>
+        <button class="map-layer-btn" data-layer="rain">🌧️ Rainfall</button>
+        <button class="map-layer-btn" data-layer="aqi">🫁 Air Quality</button>
+        <button class="map-layer-btn" data-layer="wind">💨 Wind</button>
+      </div>
+      <div class="map-container" id="map-container">
+        <div class="map-placeholder">
+          <div class="map-placeholder-icon">🗺️</div>
+          <h3>Interactive Weather Map</h3>
+          <p>Connect a mapping library (OpenLayers, Leaflet) or a weather tile API to visualize real-time data layers. Your IoT station is pinned below.</p>
+          <span class="badge badge-iot" style="margin-top:8px">Integration Ready</span>
+        </div>
+      </div>
+      <!-- Station info -->
+      <div class="station-info-card" id="map-station-info">
+        <div class="sic-icon">📡</div>
+        <div class="sic-body">
+          <div class="sic-name">WeatherIQ Station Alpha</div>
+          <div class="sic-loc" id="map-station-loc">Murshidabad, West Bengal — 24.1768°N 88.2712°E</div>
+          <div class="sic-readings" id="map-station-readings"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: ANALYTICS (Historical Data)
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-analytics" role="region" aria-label="Analytics">
+      <div class="page-header">
+        <h1>Historical Analytics</h1>
+        <span class="badge badge-iot">● LIVE IoT</span>
+      </div>
+
+      <!-- Time range selector -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="section-header" style="margin-bottom:14px">
+          <h3>Select Range</h3>
+        </div>
+        <div class="time-range-selector" id="time-range-selector">
+          <button class="trn-btn" data-range="1h">1h</button>
+          <button class="trn-btn" data-range="6h">6h</button>
+          <button class="trn-btn" data-range="12h">12h</button>
+          <button class="trn-btn active" data-range="24h">24h</button>
+          <button class="trn-btn" data-range="7d">7d</button>
+          <button class="trn-btn" data-range="30d">30d</button>
+        </div>
+        <!-- Sensor selector -->
+        <div class="analytics-sensor-select" id="analytics-sensor-select">
+          <button class="sensor-select-btn active" data-sensor="temperature">🌡️ Temperature</button>
+          <button class="sensor-select-btn" data-sensor="humidity">💧 Humidity</button>
+          <button class="sensor-select-btn" data-sensor="pressure">🌬️ Pressure</button>
+          <button class="sensor-select-btn" data-sensor="aqi">🫁 AQI</button>
+          <button class="sensor-select-btn" data-sensor="uvIndex">☀️ UV</button>
+          <button class="sensor-select-btn" data-sensor="windSpeed">💨 Wind</button>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="analytics-stats-row" id="analytics-stats-row">
+        <div class="astat"><div class="astat-label">Min</div><div class="astat-value">—</div></div>
+        <div class="astat"><div class="astat-label">Max</div><div class="astat-value">—</div></div>
+        <div class="astat"><div class="astat-label">Average</div><div class="astat-value">—</div></div>
+        <div class="astat"><div class="astat-label">Readings</div><div class="astat-value">—</div></div>
+      </div>
+
+      <!-- Chart -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="section-header" style="margin-bottom:12px">
+          <h3 id="analytics-chart-title">Temperature — Last 24h</h3>
+          <span class="last-updated-chip live" id="analytics-last-updated">
+            <span class="live-dot"></span>
+            <span>Live</span>
+          </span>
+        </div>
+        <div id="analytics-chart-wrap" style="overflow:hidden">
+          <div class="skeleton skel-block" style="height:160px"></div>
+        </div>
+      </div>
+
+      <!-- System Analytics -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="section-header" style="margin-bottom:14px">
+          <h3>System Analytics</h3>
+        </div>
+        <div class="system-analytics-grid" id="system-analytics-grid">
+          <div class="skeleton skel-block" style="height:100px"></div>
+        </div>
+      </div>
+
+      <!-- Data Export -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="section-header" style="margin-bottom:4px">
+          <h3>📤 Export Data</h3>
+        </div>
+        <p style="font-size:0.8125rem;color:var(--text-3);margin-bottom:12px">Download historical sensor data in your preferred format.</p>
+        <div class="time-range-selector" id="export-range-selector" style="margin-bottom:12px">
+          <button class="trn-btn active" data-export-range="24h">24h</button>
+          <button class="trn-btn" data-export-range="7d">7d</button>
+          <button class="trn-btn" data-export-range="30d">30d</button>
+        </div>
+        <div class="export-options">
+          <div class="export-card" id="export-csv">
+            <div class="export-card-icon">📊</div>
+            <div class="export-card-title">CSV</div>
+            <div class="export-card-desc">Spreadsheet-compatible sensor data</div>
+          </div>
+          <div class="export-card" id="export-json">
+            <div class="export-card-icon">{ }</div>
+            <div class="export-card-title">JSON</div>
+            <div class="export-card-desc">Full data package with AI predictions</div>
+          </div>
+          <div class="export-card" id="export-pdf">
+            <div class="export-card-icon">📄</div>
+            <div class="export-card-title">PDF Report</div>
+            <div class="export-card-desc">Printable weather intelligence report</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-analytics -->
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: AI PREDICTION
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-ai" role="region" aria-label="AI weather prediction">
+      <div class="page-header">
+        <h1>AI Weather Prediction</h1>
+        <span class="badge badge-ai">⬡ AI PREDICTED</span>
+      </div>
+      <div id="ai-full-content"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: AI LAB
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-ailab" role="region" aria-label="AI Lab">
+      <div class="page-header">
+        <h1>AI Lab</h1>
+        <span class="badge badge-ai">⬡ AI MODEL</span>
+      </div>
+
+      <!-- AI Lab Tabs -->
+      <div class="ai-lab-tabs" id="ai-lab-tabs">
+        <button class="ai-lab-tab active" data-tab="performance">📊 Model Performance</button>
+        <button class="ai-lab-tab" data-tab="vs-actual">🎯 AI vs Actual</button>
+        <button class="ai-lab-tab" data-tab="xai">🔍 Why This Prediction?</button>
+        <button class="ai-lab-tab" data-tab="compare">⚖️ Model Comparison</button>
+        <button class="ai-lab-tab" data-tab="local-vs-ext">📍 Local vs External</button>
+      </div>
+
+      <!-- Tab: Model Performance -->
+      <div class="ai-lab-panel active" id="ailab-panel-performance">
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-header" style="margin-bottom:14px">
+            <h3>Current Model</h3>
+            <span class="model-status-badge healthy" id="model-status-badge">● Healthy</span>
+          </div>
+          <div class="model-info-grid" id="model-info-grid">
+            <div class="skeleton skel-block" style="height:80px"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-header" style="margin-bottom:14px"><h3>Metrics</h3></div>
+          <div id="model-metrics-content">
+            <div class="skeleton skel-block" style="height:160px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: AI vs Actual -->
+      <div class="ai-lab-panel" id="ailab-panel-vs-actual">
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-header" style="margin-bottom:14px">
+            <h3>Accuracy Overview</h3>
+          </div>
+          <div id="ai-vs-actual-summary">
+            <div class="skeleton skel-block" style="height:80px"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-header" style="margin-bottom:12px"><h3>Last 8 Hours — Predicted vs Actual</h3></div>
+          <div id="ai-vs-actual-chart" style="margin-bottom:14px">
+            <div class="skeleton skel-block" style="height:130px"></div>
+          </div>
+          <div id="ai-vs-actual-table-wrap">
+            <div class="skeleton skel-block" style="height:200px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Why This Prediction? (XAI) -->
+      <div class="ai-lab-panel" id="ailab-panel-xai">
+        <div class="card">
+          <div class="section-header" style="margin-bottom:14px">
+            <h3>Prediction Explainability</h3>
+            <span class="badge badge-ai">⬡ XAI</span>
+          </div>
+          <div id="xai-content">
+            <div class="skeleton skel-block" style="height:200px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Model Comparison -->
+      <div class="ai-lab-panel" id="ailab-panel-compare">
+        <div class="card">
+          <div class="section-header" style="margin-bottom:14px">
+            <h3>Model Comparison</h3>
+          </div>
+          <div id="model-compare-content">
+            <div class="skeleton skel-block" style="height:160px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Local vs External -->
+      <div class="ai-lab-panel" id="ailab-panel-local-vs-ext">
+        <div class="card">
+          <div class="section-header" style="margin-bottom:14px">
+            <h3>Local IoT vs External Weather Service</h3>
+            <span class="badge badge-iot">● IoT</span>
+            <span class="badge badge-ext" style="margin-left:4px">↗ EXT</span>
+          </div>
+          <div id="local-vs-ext-content">
+            <div class="skeleton skel-block" style="height:200px"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-ailab -->
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: FORECAST
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-forecast" role="region" aria-label="7-day forecast">
+      <div class="page-header">
+        <h1>7-Day Forecast</h1>
+        <span class="badge badge-ai">⬡ AI PREDICTED</span>
+      </div>
+      <div id="forecast-full-content"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: WEATHER INTELLIGENCE
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-intelligence" role="region" aria-label="Weather intelligence">
+      <div class="page-header">
+        <h1>Weather Intelligence</h1>
+      </div>
+      <div id="intelligence-full-content"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: SEARCH
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-search" role="region" aria-label="Search locations">
+      <div class="page-header">
+        <h1>Search Location</h1>
+        <span class="badge badge-ext">↗ EXTERNAL WEATHER</span>
+      </div>
+      <div role="search">
+        <div class="search-input-large">
+          <i data-lucide="search" aria-hidden="true"></i>
+          <input
+            type="text"
+            id="search-page-input"
+            placeholder="Search city or location…"
+            autocomplete="off"
+            aria-label="Search city or location"
+            aria-controls="search-page-results"
+          />
+        </div>
+        <div id="search-page-hint" style="margin-bottom:12px;color:var(--text-3);font-size:0.8125rem">
+          Type at least 2 characters to see suggestions
+        </div>
+        <div class="search-results-page" id="search-page-results" role="listbox" aria-label="Location suggestions"></div>
+      </div>
+      <!-- External weather result panel -->
+      <div id="ext-weather-result" hidden style="margin-top:24px"></div>
+
+      <!-- NEW: Local vs External comparison (after searching) -->
+      <div id="local-vs-ext-search" hidden style="margin-top:16px"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: SAVED LOCATIONS
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-saved" role="region" aria-label="Saved locations">
+      <div class="page-header">
+        <h1>Saved Locations</h1>
+      </div>
+      <div class="saved-list" id="saved-list" role="list" aria-label="Saved locations"></div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════
+         PAGE: SETTINGS
+    ════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-settings" role="region" aria-label="Settings">
+      <div class="page-header">
+        <h1>Settings</h1>
+      </div>
+      <div id="settings-content"></div>
+    </div>
+
+  </main><!-- /page-content -->
+</div><!-- /app-wrapper -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     MOBILE BOTTOM NAVIGATION
+════════════════════════════════════════════════════════════════ -->
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav" role="navigation" aria-label="Mobile navigation">
+  <div class="mobile-nav-items">
+    <a href="#" class="mobile-nav-item active" data-page="dashboard" aria-label="Home">
+      <i data-lucide="home"></i>
+      <span>Home</span>
+    </a>
+    <a href="#" class="mobile-nav-item" data-page="analytics" aria-label="Analytics">
+      <i data-lucide="bar-chart-2"></i>
+      <span>Analytics</span>
+    </a>
+    <a href="#" class="mobile-nav-item" data-page="search" aria-label="Search">
+      <i data-lucide="search"></i>
+      <span>Search</span>
+    </a>
+    <a href="#" class="mobile-nav-item" data-page="saved" aria-label="Saved">
+      <i data-lucide="bookmark"></i>
+      <span>Saved</span>
+    </a>
+    <a href="#" class="mobile-nav-item" data-page="settings" aria-label="Settings">
+      <i data-lucide="settings"></i>
+      <span>Profile</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SENSOR DETAIL MODAL
+════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-label="Sensor detail">
+  <div class="sensor-modal" id="sensor-modal">
+    <button class="modal-close" id="modal-close" aria-label="Close modal">
+      <i data-lucide="x"></i>
+    </button>
+    <div class="modal-header" id="modal-header"></div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AI WEATHER ASSISTANT WIDGET
+════════════════════════════════════════════════════════════════ -->
+<div class="assistant-widget" id="assistant-widget">
+  <button class="assistant-fab" id="assistant-fab" aria-label="Open AI Weather Assistant" title="Ask WeatherIQ">
+    🤖
+  </button>
+  <div class="assistant-panel" id="assistant-panel" role="dialog" aria-label="AI Weather Assistant">
+    <div class="assistant-header">
+      <span class="assistant-header-icon">🤖</span>
+      <div class="assistant-header-text">
+        <h3>Ask WeatherIQ</h3>
+        <p>Powered by IoT + AI data</p>
+      </div>
+      <button class="assistant-close" id="assistant-close" aria-label="Close assistant">✕</button>
+    </div>
+    <div class="assistant-messages" id="assistant-messages" role="log" aria-live="polite">
+      <div class="assistant-msg bot">
+        Hi! I'm WeatherIQ. Ask me anything about your local weather conditions, forecasts, or what you should do today. 🌦️
+      </div>
+    </div>
+    <div class="assistant-suggestions" id="assistant-suggestions">
+      <button class="suggestion-chip" data-query="Can I go running now?">🏃 Can I run?</button>
+      <button class="suggestion-chip" data-query="Will it rain today?">🌧️ Rain today?</button>
+      <button class="suggestion-chip" data-query="What is the air quality?">🫁 Air quality?</button>
+      <button class="suggestion-chip" data-query="What is the UV index?">☀️ UV index?</button>
+    </div>
+    <div class="assistant-input-row">
+      <input
+        type="text"
+        class="assistant-input"
+        id="assistant-input"
+        placeholder="Ask about weather conditions…"
+        autocomplete="off"
+        aria-label="Ask WeatherIQ a question"
+      />
+      <button class="assistant-send" id="assistant-send" aria-label="Send question">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PWA INSTALL BAR
+════════════════════════════════════════════════════════════════ -->
+<div class="pwa-install-bar hidden" id="pwa-install-bar" role="dialog" aria-label="Install WeatherIQ app">
+  <div class="pwa-install-icon">📱</div>
+  <div class="pwa-install-text">
+    <div class="pwa-install-title">Install WeatherIQ</div>
+    <div class="pwa-install-sub">Add to your home screen for quick access</div>
+  </div>
+  <div class="pwa-install-btns">
+    <button class="btn-pwa-install" id="btn-pwa-install">Install</button>
+    <button class="btn-pwa-dismiss" id="btn-pwa-dismiss">Not now</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════════════════ -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="js/mock-data.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/api.js"></script>
+<script src="js/features/notifications.js"></script>
+<script src="js/features/export.js"></script>
+<script src="js/features/pwa.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

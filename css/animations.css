@@ -1,0 +1,229 @@
+/* ============================================================
+   WeatherIQ — Animations & Transitions
+   All animations respect prefers-reduced-motion.
+   ============================================================ */
+
+/* ── Keyframes ─────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-16px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1;    }
+  50%       { opacity: 0.45; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  from { background-position: -300px 0; }
+  to   { background-position:  300px 0; }
+}
+
+@keyframes dotBlink {
+  0%, 100% { opacity: 1;   }
+  50%       { opacity: 0.3; }
+}
+
+@keyframes growBar {
+  from { width: 0%; }
+  to   { width: var(--bar-w, 100%); }
+}
+
+/* ── Utility classes ────────────────────────────────────────── */
+
+.anim-fade-in  { animation: fadeIn  0.3s ease both; }
+.anim-fade-up  { animation: fadeUp  0.4s ease both; }
+.anim-scale-in { animation: scaleIn 0.3s ease both; }
+
+.anim-delay-1  { animation-delay: 0.05s; }
+.anim-delay-2  { animation-delay: 0.10s; }
+.anim-delay-3  { animation-delay: 0.15s; }
+.anim-delay-4  { animation-delay: 0.20s; }
+.anim-delay-5  { animation-delay: 0.25s; }
+.anim-delay-6  { animation-delay: 0.30s; }
+
+/* ── Skeleton shimmer ───────────────────────────────────────── */
+
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-base)   0px,
+    var(--skeleton-shine) 150px,
+    var(--skeleton-base) 300px
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* ── Live IoT dot blink ─────────────────────────────────────── */
+
+.iot-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.iot-dot.connected { background: var(--iot-color); animation: dotBlink 2s ease-in-out infinite; }
+.iot-dot.syncing   { background: var(--warning);   animation: dotBlink 0.8s ease-in-out infinite; }
+.iot-dot.offline   { background: var(--text-3); }
+.iot-dot.error     { background: var(--danger);    animation: dotBlink 0.5s ease-in-out infinite; }
+
+/* ── Spinner ────────────────────────────────────────────────── */
+
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+/* ── Card hover lift ────────────────────────────────────────── */
+
+.card {
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ── Button hover & active ──────────────────────────────────── */
+
+button, .btn {
+  transition: background 0.18s ease, transform 0.15s ease, opacity 0.15s ease;
+}
+button:active, .btn:active {
+  transform: scale(0.96);
+}
+
+/* ── Nav item transitions ───────────────────────────────────── */
+
+.nav-item {
+  transition: background 0.18s ease, color 0.18s ease, padding-left 0.18s ease;
+}
+.nav-item:hover { padding-left: 18px; }
+
+/* ── Sensor card ripple ─────────────────────────────────────── */
+
+.sensor-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.sensor-card:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: var(--shadow-md);
+}
+.sensor-card:active {
+  transform: scale(0.98);
+}
+
+/* ── Modal transitions ──────────────────────────────────────── */
+
+.modal-overlay {
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+.modal-overlay.open {
+  opacity: 1; visibility: visible;
+}
+.modal-overlay:not(.open) {
+  opacity: 0; visibility: hidden;
+}
+
+.sensor-modal {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+}
+.modal-overlay.open .sensor-modal {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+.modal-overlay:not(.open) .sensor-modal {
+  transform: translateY(24px) scale(0.95);
+  opacity: 0;
+}
+
+/* ── Search dropdown ────────────────────────────────────────── */
+
+.search-dropdown {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.search-dropdown.visible {
+  opacity: 1; transform: translateY(0);
+}
+.search-dropdown:not(.visible) {
+  opacity: 0; transform: translateY(-6px); pointer-events: none;
+}
+
+/* ── Sidebar collapse ───────────────────────────────────────── */
+
+.sidebar {
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.app-wrapper {
+  transition: margin-left 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Theme switch ───────────────────────────────────────────── */
+
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ── Rain probability bar ───────────────────────────────────── */
+
+.rain-bar-fill {
+  animation: growBar 0.6s ease both;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Respect prefers-reduced-motion
+   ──────────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:   0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration:  0.01ms !important;
+  }
+  .iot-dot.connected,
+  .iot-dot.syncing,
+  .iot-dot.error { animation: none; }
+  .skeleton      { animation: none; background: var(--skeleton-base); }
+  .card:hover    { transform: none; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Mobile: disable heavy animations for performance
+   ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .card:hover    { transform: none; box-shadow: var(--shadow-sm); }
+  .sensor-card:hover { transform: none; }
+  .nav-item:hover { padding-left: 12px; }
+}
