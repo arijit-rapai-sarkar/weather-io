@@ -54,7 +54,6 @@
   to   { width: var(--bar-w, 100%); }
 }
 
-/* ── Utility classes ────────────────────────────────────────── */
 
 .anim-fade-in  { animation: fadeIn  0.3s ease both; }
 .anim-fade-up  { animation: fadeUp  0.4s ease both; }

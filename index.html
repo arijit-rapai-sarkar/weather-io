@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="WeatherIQ — AI-powered weather intelligence platform with real-time IoT sensors, machine learning predictions, anomaly detection, and smart alerts. Monitor temperature, humidity, AQI, UV, wind, and more." />
-  <meta name="theme-color" content="#3B82F6" />
+  <meta name="theme-color" content="#120D23" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="WeatherIQ" />
@@ -18,6 +18,7 @@
   <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css" />
@@ -25,7 +26,7 @@
 </head>
 <body>
 
-<!-- Dynamic Weather Background -->
+<!-- Dynamic Weather Background (Solid Color for Material You) -->
 <div class="weather-bg" id="weather-bg" aria-hidden="true"></div>
 
 <!-- Demo Mode Banner -->
@@ -46,69 +47,33 @@
 <!-- ═══════════════════════════════════════════════════════════
      SIDEBAR — Desktop persistent navigation
 ════════════════════════════════════════════════════════════════ -->
-<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+<aside class="sidebar icon-only" id="sidebar" aria-label="Main navigation">
   <div class="sidebar-brand">
-    <div class="brand-icon" aria-hidden="true">🌦️</div>
-    <span class="brand-name">WeatherIQ</span>
+    <div class="brand-icon" aria-hidden="true">
+      <img src="https://img.icons8.com/color/48/000000/sun--v1.png" width="24" height="24" alt="logo"/>
+    </div>
   </div>
 
   <nav class="sidebar-nav" aria-label="Sidebar navigation">
-    <!-- Main -->
-    <div class="nav-section-label">Main</div>
-    <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard">
+    <a href="#" class="nav-item active" data-page="dashboard" id="nav-dashboard" title="Dashboard">
       <i data-lucide="layout-dashboard"></i>
-      <span>Dashboard</span>
     </a>
-    <a href="#" class="nav-item" data-page="sensors" id="nav-sensors">
+    <a href="#" class="nav-item" data-page="sensors" id="nav-sensors" title="Live Sensors">
       <i data-lucide="activity"></i>
-      <span>Live Sensors</span>
     </a>
-    <a href="#" class="nav-item" data-page="map" id="nav-map">
+    <a href="#" class="nav-item" data-page="map" id="nav-map" title="Weather Map">
       <i data-lucide="map"></i>
-      <span>Weather Map</span>
     </a>
-    <a href="#" class="nav-item" data-page="analytics" id="nav-analytics">
+    <a href="#" class="nav-item" data-page="analytics" id="nav-analytics" title="Analytics">
       <i data-lucide="bar-chart-2"></i>
-      <span>Analytics</span>
     </a>
-
-    <!-- Forecast & Intelligence -->
-    <div class="nav-section-label">Intelligence</div>
-    <a href="#" class="nav-item" data-page="ai" id="nav-ai">
-      <i data-lucide="sparkles"></i>
-      <span>AI Prediction</span>
-    </a>
-    <a href="#" class="nav-item" data-page="ailab" id="nav-ailab">
-      <i data-lucide="flask-conical"></i>
-      <span>AI Lab</span>
-    </a>
-    <a href="#" class="nav-item" data-page="forecast" id="nav-forecast">
+    <a href="#" class="nav-item" data-page="forecast" id="nav-forecast" title="Forecast">
       <i data-lucide="calendar-days"></i>
-      <span>Forecast</span>
     </a>
-    <a href="#" class="nav-item" data-page="intelligence" id="nav-intelligence">
-      <i data-lucide="lightbulb"></i>
-      <span>Intelligence</span>
-    </a>
-
-    <!-- Locations -->
-    <div class="nav-section-label">Locations</div>
-    <a href="#" class="nav-item" data-page="search" id="nav-search">
-      <i data-lucide="search"></i>
-      <span>Search</span>
-    </a>
-    <a href="#" class="nav-item" data-page="saved" id="nav-saved">
-      <i data-lucide="bookmark"></i>
-      <span>Saved Locations</span>
+    <a href="#" class="nav-item" data-page="settings" id="nav-settings" title="Settings">
+      <i data-lucide="settings"></i>
     </a>
   </nav>
-
-  <div class="sidebar-footer">
-    <a href="#" class="nav-item" data-page="settings" id="nav-settings">
-      <i data-lucide="settings"></i>
-      <span>Settings</span>
-    </a>
-  </div>
 </aside>
 
 <!-- ═══════════════════════════════════════════════════════════
@@ -141,11 +106,9 @@
 
   <!-- ── Topbar ─────────────────────────────────────────────── -->
   <header class="topbar" id="topbar" role="banner">
-    <div class="topbar-left">
-      <button class="sidebar-toggle icon-btn" id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false">
-        <i data-lucide="menu"></i>
-      </button>
-      <div class="topbar-brand" aria-hidden="true">WeatherIQ</div>
+    <div class="topbar-left" style="display: flex; flex-direction: column; justify-content: center;">
+      <span style="font-size: 0.875rem; color: var(--text-2); font-weight: 500;">Hello,</span>
+      <span style="font-size: 1.25rem; font-weight: 700; color: var(--text-1);">User</span>
     </div>
 
     <div class="topbar-center">
@@ -220,195 +183,181 @@
         </div>
       </div>
 
-      <!-- Weather hero row (Current + AI) -->
-      <div class="weather-hero-row">
+      <!-- Dashboard Grid Layout -->
+      <div class="dashboard-layout">
+        
+        <!-- MAIN DASHBOARD CONTENT -->
+        <div class="dashboard-main">
+          
+          <!-- Hero Cards (Weather & Air Quality) -->
+          <div class="weather-hero-row">
+            
+            <!-- Weather Card (Sunset BG) -->
+            <div class="card weather-hero-card bg-sunset" id="current-weather-card">
+              <div class="wh-top">
+                <div class="wh-title">
+                  <i data-lucide="cloud-sun"></i>
+                  <span>Weather<br><small>What's the weather.</small></span>
+                </div>
+              </div>
+              <div class="wh-middle">
+                <div class="wh-temp"><span id="cw-temp">22</span>°C</div>
+                <div class="wh-badge">11°C</div>
+                <div class="wh-condition" id="cw-condition">Partly Cloudy</div>
+              </div>
+              <div class="wh-bottom">
+                <div class="wh-chip dark">
+                  <span>Pressure</span>
+                  <strong id="cw-pressure">800mb</strong>
+                </div>
+                <div class="wh-chip green">
+                  <span>Visibility</span>
+                  <strong id="cw-vis">4.3 km</strong>
+                </div>
+                <div class="wh-chip white">
+                  <span>Humidity</span>
+                  <strong id="cw-humidity">87%</strong>
+                </div>
+              </div>
+            </div>
 
-        <!-- Current weather (IoT) -->
-        <div class="card current-weather-card anim-fade-up" id="current-weather-card" aria-label="Current weather from IoT sensor">
-          <!-- Skeleton state -->
-          <div id="cw-skeleton" class="cw-skeleton-wrap">
-            <div class="skeleton skel-block" style="height:200px"></div>
-          </div>
-          <!-- Content -->
-          <div id="cw-content" hidden>
-            <div class="cw-header">
-              <span class="badge badge-iot" aria-label="Live IoT sensor data">● LIVE IoT</span>
-              <span class="cw-condition" id="cw-condition"></span>
-            </div>
-            <div class="cw-temp-row">
-              <span class="cw-icon" id="cw-icon" aria-hidden="true"></span>
-              <span class="cw-temp" id="cw-temp"></span>
-              <span class="cw-unit">°C</span>
-            </div>
-            <div class="cw-feels">
-              <span>Feels like <strong id="cw-feels"></strong></span>
-              <span class="cw-humidity">
-                <i data-lucide="droplets" aria-hidden="true"></i>
-                <span id="cw-humidity"></span>
-              </span>
-            </div>
-            <div class="cw-meta">
-              <div class="cw-meta-item">
-                <i data-lucide="wind" aria-hidden="true"></i>
-                <span id="cw-wind"></span>
+            <!-- Air Quality Card (Sky BG) -->
+            <div class="card aqi-hero-card bg-sky" id="aqi-card">
+              <div class="wh-top">
+                <div class="wh-title">
+                  <i data-lucide="wind"></i>
+                  <span>Air Quality<br><small>Main pollutant : PM 2.5</small></span>
+                </div>
               </div>
-              <div class="cw-meta-item">
-                <i data-lucide="eye" aria-hidden="true"></i>
-                <span id="cw-vis"></span>
+              <div class="wh-middle">
+                <div class="wh-temp" style="font-size:3rem">390</div>
+                <div class="wh-badge aqi-badge">AQI</div>
+                <div class="wh-condition">West Wind</div>
               </div>
-              <div class="cw-meta-item">
-                <i data-lucide="gauge" aria-hidden="true"></i>
-                <span id="cw-pressure"></span>
+              <div class="wh-bottom" style="margin-top:auto;">
+                <div class="aqi-bar-container">
+                  <div class="aqi-labels">
+                    <span>Good</span>
+                    <span>Standard</span>
+                    <span>Hazardous</span>
+                  </div>
+                  <div class="aqi-bar-track">
+                    <div class="aqi-bar-fill" style="width: 60%;"></div>
+                    <div class="aqi-bar-thumb" style="left: 60%;">Standard</div>
+                  </div>
+                </div>
               </div>
             </div>
-            <!-- NEW: Conditions summary grid -->
-            <div class="conditions-summary" id="conditions-summary" style="margin-top:14px"></div>
-          </div>
-          <!-- Error/Offline state -->
-          <div id="cw-error" hidden class="state-card">
-            <div class="state-icon">📡</div>
-            <div class="state-title">IoT Device Offline</div>
-            <div class="state-msg">Showing last available reading</div>
-          </div>
-        </div>
+            
+          </div><!-- /weather-hero-row -->
 
-        <!-- AI Prediction -->
-        <div class="card ai-prediction-card anim-fade-up anim-delay-1" id="ai-prediction-card" aria-label="AI weather prediction">
-          <!-- Skeleton -->
-          <div id="ai-skeleton">
-            <div class="skeleton skel-block" style="height:200px"></div>
-          </div>
-          <!-- Content -->
-          <div id="ai-content" hidden>
-            <div class="ai-header">
+          <!-- Bottom Cards (Temp Chart & Tomorrow) -->
+          <div class="dashboard-bottom-row">
+            
+            <!-- Temperature Chart Card -->
+            <div class="card temp-chart-card">
+              <div class="card-header-flex">
+                <h3>How's the<br>temperature today?</h3>
+                <div class="chart-filters">
+                  <button class="icon-btn active" style="background:var(--accent);color:white"><i data-lucide="thermometer"></i></button>
+                  <button class="icon-btn"><i data-lucide="umbrella"></i></button>
+                  <button class="icon-btn"><i data-lucide="wind"></i></button>
+                </div>
+              </div>
+              <div class="chart-mockup">
+                <!-- A simple SVG or placeholder for the spline chart -->
+                <div class="skeleton skel-block" style="height:120px;width:100%;background:var(--surface-3);border-radius:12px;margin-top:20px;"></div>
+              </div>
+            </div>
+
+            <!-- Tomorrow Card (Rain BG) -->
+            <div class="card tomorrow-card bg-rain">
+              <div class="wh-top">
+                <span style="font-size:0.875rem">Tomorrow</span>
+                <h3 style="font-size:1.5rem;font-weight:700">Alam Barzah</h3>
+              </div>
+              <div class="wh-middle" style="margin-top:auto; padding-bottom:10px;">
+                <div class="wh-temp" style="color:var(--text-1);">20°C</div>
+                <div class="wh-condition" style="color:var(--text-1);">Rainy</div>
+              </div>
+            </div>
+
+          </div><!-- /dashboard-bottom-row -->
+
+        </div><!-- /dashboard-main -->
+
+        <!-- RIGHT SIDEBAR (Sun, UVI, Forecast) -->
+        <aside class="dashboard-right">
+          
+          <!-- Sun Widget -->
+          <div class="right-widget">
+            <div class="rw-header">
               <div>
-                <span class="badge badge-ai" aria-label="AI predicted data">⬡ AI PREDICTED</span>
-                <h3 style="margin-top:6px">Next 6 Hours</h3>
+                <h3 style="font-size:1.1rem">Sun</h3>
+                <span style="font-size:0.75rem;color:var(--text-3)">Banten, Indonesia</span>
               </div>
-              <div class="ai-confidence" id="ai-confidence"></div>
+              <div class="rw-temp" style="font-size:1.5rem;font-weight:700;color:var(--accent)">22°C</div>
             </div>
-            <div class="ai-timeline" id="ai-timeline" role="list" aria-label="Hourly AI predictions"></div>
-            <div class="ai-summary" id="ai-summary"></div>
+            <div class="sun-arc-container" style="padding:20px 0;">
+              <!-- Mockup Sun Arc -->
+              <svg viewBox="0 0 200 100" width="100%">
+                <path d="M 10 90 A 90 90 0 0 1 190 90" fill="none" stroke="#E2E8F0" stroke-width="2" stroke-dasharray="4 4" />
+                <path d="M 10 90 A 90 90 0 0 1 100 0" fill="none" stroke="var(--accent)" stroke-width="3" />
+                <circle cx="100" cy="0" r="6" fill="var(--accent)" stroke="white" stroke-width="2" />
+                <line x1="0" y1="90" x2="200" y2="90" stroke="#E2E8F0" stroke-width="2" />
+              </svg>
+              <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.75rem;font-weight:600;">
+                <div style="text-align:left;">Sunset<br><span style="color:var(--text-3);font-weight:400">06:00 am</span></div>
+                <div style="text-align:right;">Sunrise<br><span style="color:var(--text-3);font-weight:400">06:45 am</span></div>
+              </div>
+            </div>
           </div>
-          <!-- Error -->
-          <div id="ai-error" hidden class="state-card">
-            <div class="state-icon">🤖</div>
-            <div class="state-title">Prediction Unavailable</div>
-            <div class="state-msg">AI prediction is temporarily unavailable</div>
+
+          <!-- UVI Card -->
+          <div class="card uvi-card dark-card">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <i data-lucide="sun" style="color:var(--accent)"></i>
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-size:1.25rem;font-weight:700;color:white;">20 UVI</span>
+                  <span class="badge" style="background:#B4C424;color:black;">Moderate</span>
+                </div>
+                <div style="font-size:0.75rem;color:rgba(255,255,255,0.7);margin-top:4px;">Moderate risk of from UV rays</div>
+              </div>
+            </div>
           </div>
-        </div>
 
-      </div><!-- /weather-hero-row -->
-
-      <!-- NEW: Weather Score + Activity Scores -->
-      <div class="bottom-row anim-fade-up" style="margin-bottom:20px" id="score-row">
-        <!-- Weather Score -->
-        <div class="card" id="weather-score-card">
-          <div class="section-header">
-            <h3>Weather Score</h3>
-            <span class="badge badge-iot">● LIVE IoT</span>
+          <!-- Weather Prediction (5-day) -->
+          <div class="right-widget prediction-widget" style="margin-top:24px;">
+            <h3 style="margin-bottom:16px;">Weather Prediction</h3>
+            
+            <div class="prediction-list">
+              <div class="prediction-item card">
+                <i data-lucide="cloud" style="color:#94A3B8;width:32px;height:32px"></i>
+                <div style="flex:1;">
+                  <div style="font-size:0.75rem;color:var(--text-3)">November 10</div>
+                  <div style="font-weight:600">Cloudy</div>
+                </div>
+                <div style="font-weight:600;color:var(--accent)">26° <span style="color:var(--text-3)">/ 19°</span></div>
+              </div>
+              
+              <div class="prediction-item card">
+                <i data-lucide="sun" style="color:var(--accent);width:32px;height:32px"></i>
+                <div style="flex:1;">
+                  <div style="font-size:0.75rem;color:var(--text-3)">November 11</div>
+                  <div style="font-weight:600">Bright</div>
+                </div>
+                <div style="font-weight:600;color:var(--accent)">26° <span style="color:var(--text-3)">/ 20°</span></div>
+              </div>
+            </div>
+            
+            <button class="btn-primary" style="width:100%;margin-top:16px;border-radius:99px;padding:12px;background:var(--accent);color:white;font-weight:600;display:flex;justify-content:center;align-items:center;gap:8px;">
+              <i data-lucide="calendar"></i> Next 5 Days
+            </button>
           </div>
-          <div id="weather-score-content" class="weather-score-card">
-            <div class="skeleton skel-block" style="height:120px;width:100%"></div>
-          </div>
-        </div>
-        <!-- Activity Scores -->
-        <div class="card" id="activity-score-card">
-          <div class="section-header">
-            <h3>Outdoor Activity Scores</h3>
-            <span class="badge badge-iot">● LIVE IoT</span>
-          </div>
-          <div class="activity-grid" id="activity-grid">
-            <div class="skeleton skel-block" style="height:120px;width:100%"></div>
-          </div>
-        </div>
-      </div>
 
-      <!-- NEW: Weather Timeline -->
-      <div class="card anim-fade-up" style="margin-bottom:20px" id="timeline-card">
-        <div class="section-header">
-          <h3>Weather Timeline</h3>
-          <span class="badge badge-ai">⬡ AI PREDICTED</span>
-        </div>
-        <div class="weather-timeline" id="weather-timeline" role="list" aria-label="6-hour weather timeline"></div>
-      </div>
-
-      <!-- NEW: Sunrise / Sunset -->
-      <div class="card anim-fade-up" style="margin-bottom:20px" id="sun-card">
-        <div class="section-header">
-          <h3>☀️ Sunrise & Sunset</h3>
-        </div>
-        <div class="sun-widget" id="sun-widget">
-          <div class="skeleton skel-block" style="height:60px;width:100%"></div>
-        </div>
-      </div>
-
-      <!-- Live sensor section -->
-      <div class="sensor-section anim-fade-up anim-delay-2">
-        <div class="section-header">
-          <h2>Live Environmental Data</h2>
-          <span class="badge badge-iot">● LIVE IoT</span>
-        </div>
-        <div class="sensor-grid" id="sensor-grid" role="list" aria-label="Live sensor readings">
-          <!-- Skeleton cards -->
-          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
-          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
-          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
-          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
-          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
-          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
-          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
-          <div class="skeleton skel-block" style="height:130px;border-radius:12px"></div>
-        </div>
-      </div>
-
-      <!-- Hourly forecast -->
-      <div class="card hourly-section anim-fade-up anim-delay-3" id="hourly-section">
-        <div class="section-header">
-          <h3>Hourly Forecast</h3>
-          <span class="badge badge-ai">⬡ AI PREDICTED</span>
-        </div>
-        <div class="hourly-scroll" id="hourly-scroll" role="list" aria-label="Hourly forecast">
-          <div class="skeleton skel-block" style="height:100px;width:100%"></div>
-        </div>
-      </div>
-
-      <!-- 7-day + Intelligence -->
-      <div class="bottom-row anim-fade-up anim-delay-4">
-
-        <!-- 7-Day forecast -->
-        <div class="card seven-day-card" id="seven-day-card">
-          <div class="section-header">
-            <h3>7-Day Forecast</h3>
-            <span class="badge badge-ai">⬡ AI PREDICTED</span>
-          </div>
-          <div class="seven-day-list" id="seven-day-list" role="list" aria-label="7-day forecast">
-            <div class="skeleton skel-block" style="height:220px"></div>
-          </div>
-        </div>
-
-        <!-- Intelligence / Recommendations -->
-        <div class="card intelligence-card" id="intelligence-card">
-          <div class="section-header">
-            <h3>Weather Intelligence</h3>
-          </div>
-          <div class="reco-list" id="reco-list" role="list" aria-label="Weather recommendations">
-            <div class="skeleton skel-block" style="height:100px"></div>
-          </div>
-          <div class="do-dont" id="do-dont-wrap"></div>
-        </div>
-
-      </div><!-- /bottom-row -->
-
-      <!-- Safety alerts -->
-      <div class="safety-section anim-fade-up anim-delay-5" id="safety-section">
-        <div class="section-header">
-          <h2>Safety Alerts</h2>
-        </div>
-        <div class="safety-alerts" id="safety-alerts" role="region" aria-live="polite" aria-label="Safety alerts">
-          <div class="skeleton skel-block" style="height:60px"></div>
-        </div>
-      </div>
+        </aside>
+      </div><!-- /dashboard-layout -->
 
     </div><!-- /page-dashboard -->
 

@@ -61,21 +61,46 @@ const API = (() => {
 
   /**
    * Fetch the latest IoT sensor reading.
-   * Real call: apiFetch(ENDPOINTS.iotLatest)
    */
   async function getIoTData() {
+    try {
+      const res = await fetch('http://localhost:8000/api/weather/current');
+      if (res.ok) {
+        const realData = await res.json();
+        const mock = MockData.getIoTData();
+        mock.current.temperature = realData.temperature;
+        mock.current.humidity = realData.humidity;
+        mock.current.pressure = realData.pressure;
+        mock.current.aqi = realData.air_quality;
+        mock.current.aqiInfo = window.aqiCategory(realData.air_quality);
+        mock.lastUpdate = realData.timestamp;
+        return mock;
+      }
+    } catch(e) { console.warn("Backend /weather/current failed, using mock", e); }
+
     await delay(MOCK_DELAY.iot);
-    // return apiFetch(ENDPOINTS.iotLatest);
     return MockData.getIoTData();
   }
 
   /**
    * Fetch the latest AI prediction.
-   * Real call: apiFetch(ENDPOINTS.aiPrediction)
    */
   async function getAIPrediction() {
+    try {
+      const res = await fetch('http://localhost:8000/api/weather/predict');
+      if (res.ok) {
+        const realData = await res.json();
+        const mock = MockData.getAIPrediction();
+        if (!realData.error) {
+           mock.summary = `AI predicts max temp: ${realData.predicted_max_temp}°C. Rain tomorrow: ${realData.rain_tomorrow ? 'Yes' : 'No'}.`;
+           mock.hourly[0].temperature = realData.predicted_max_temp;
+           mock.hourly[0].rainProbability = realData.rain_tomorrow ? 80 : 10;
+        }
+        return mock;
+      }
+    } catch(e) { console.warn("Backend /weather/predict failed, using mock", e); }
+
     await delay(MOCK_DELAY.ai);
-    // return apiFetch(ENDPOINTS.aiPrediction);
     return MockData.getAIPrediction();
   }
 
@@ -152,8 +177,26 @@ const API = (() => {
    * @param {string} range — '1h'|'6h'|'12h'|'24h'|'7d'|'30d'
    */
   async function getHistoricalData(range = '24h') {
+    try {
+      const res = await fetch('http://localhost:8000/api/weather/history?limit=48');
+      if (res.ok) {
+        const realHistory = await res.json();
+        if (realHistory && realHistory.length > 0) {
+          return realHistory.map(r => ({
+            timestamp: r.timestamp,
+            temperature: r.temperature,
+            humidity: r.humidity,
+            pressure: r.pressure,
+            windSpeed: 10,
+            aqi: r.air_quality,
+            uvIndex: 4,
+            rainfall: 0,
+          }));
+        }
+      }
+    } catch(e) { console.warn("Backend /weather/history failed, using mock", e); }
+
     await delay(MOCK_DELAY.medium);
-    // return apiFetch(`${ENDPOINTS.historicalData}?range=${range}`);
     return MockData.getHistoricalData(range);
   }
 
