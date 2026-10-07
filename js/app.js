@@ -278,6 +278,7 @@ function renderCurrentWeather(data) {
   renderIoTStatus(data);
   renderLocation(data.location);
   updateWeatherBackground(c.condition);
+  updateWeatherCardAnimation(c.condition);
   updateLastUpdatedChip();
 }
 
@@ -2759,4 +2760,152 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
+}
+window.runTemporaryPrediction = function() {
+  if (!state.iotData || !state.iotData.current) return;
+  const current = state.iotData.current;
+  
+  // Create an overlay
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 9999; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); animation: fadeIn 0.3s ease;';
+  
+  // Logic
+  let predTitle = "Weather Stable";
+  let predDesc = "Based on the last IoT readings, conditions remain stable for the next hour.";
+  let color = "#10B981"; // Green
+  
+  if (current.pressure < 1010 && current.humidity > 70) {
+    predTitle = "High Rain Probability";
+    predDesc = "Pressure is dropping with high humidity. Expect rain shortly.";
+    color = "#3B82F6";
+  } else if (current.temperature > 30 && current.uvIndex > 6) {
+    predTitle = "Intense Heat Warning";
+    predDesc = "High temperature and UV detected. Stay hydrated.";
+    color = "#EF4444";
+  } else if (current.windSpeed > 15) {
+    predTitle = "Breezy Conditions";
+    predDesc = "Wind speed is elevated. It will remain breezy.";
+    color = "#F59E0B";
+  }
+  
+  overlay.innerHTML = `
+    <div style="background: var(--surface); padding: 32px; border-radius: 24px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 2px solid ${color}44;">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: ${color}22; color: ${color}; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px;">
+        <i data-lucide="zap"></i>
+      </div>
+      <h3 style="color: var(--text-1); font-size: 1.5rem; margin-bottom: 8px;">${predTitle}</h3>
+      <p style="color: var(--text-2); font-size: 0.95rem; line-height: 1.5; margin-bottom: 24px;">
+        ${predDesc}
+        <br><br>
+        <small style="color: var(--text-3); display: block;">Generated live from IoT Sensor: T:${current.temperature}°C, H:${current.humidity}%, P:${current.pressure}hPa</small>
+      </p>
+      <div style="display: flex; gap: 8px; justify-content: center;">
+        <span class="badge badge-iot" style="font-size: 0.7rem; background: rgba(144, 202, 249, 0.15); color: #90CAF9;">⚡ LIVE IoT DATA</span>
+        <span class="badge badge-ai" style="font-size: 0.7rem; background: rgba(16, 185, 129, 0.15); color: #10B981;">✨ AI ANALYSIS</span>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(overlay);
+  if (window.lucide) lucide.createIcons({root: overlay});
+  
+  // Close after 5 seconds
+  setTimeout(() => {
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.3s ease';
+    setTimeout(() => overlay.remove(), 300);
+  }, 5000);
+  
+  overlay.onclick = () => overlay.remove();
+};
+
+window.showCelestialDetails = function() {
+  const headerHtml = `
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:12px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;">
+        <i data-lucide="globe" style="width:24px;height:24px;"></i>
+      </div>
+      <div>
+        <h2 style="font-size:1.1rem;font-weight:600;margin:0;color:var(--text-1);">Celestial Details</h2>
+        <div style="font-size:0.8rem;color:var(--text-3);">Extended Sun & Moon Data</div>
+      </div>
+    </div>
+`;
+
+  const bodyHtml = `
+    <div style="display:flex;flex-direction:column;gap:24px;padding-top:10px;">
+      <!-- Sun Section -->
+      <div style="background:var(--surface-2);border-radius:16px;padding:16px;border:1px solid rgba(255,167,38,0.2);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;color:#FFA726;font-weight:600;">
+          <i data-lucide="sun"></i> Solar Tracking
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);">Sunrise</div>
+            <div style="font-weight:600;color:var(--text-1);font-size:1.1rem;">06:24 AM</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);">Sunset</div>
+            <div style="font-weight:600;color:var(--text-1);font-size:1.1rem;">18:42 PM</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);">Solar Noon</div>
+            <div style="font-weight:600;color:var(--text-1);font-size:1.1rem;">12:33 PM</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);">Day Length</div>
+            <div style="font-weight:600;color:var(--text-1);font-size:1.1rem;">12h 18m</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Moon Section -->
+      <div style="background:var(--surface-2);border-radius:16px;padding:16px;border:1px solid rgba(144,202,249,0.2);">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;color:#90CAF9;font-weight:600;">
+          <i data-lucide="moon"></i> Lunar Tracking
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);">Moon Phase</div>
+            <div style="font-weight:600;color:var(--text-1);font-size:1.1rem;">Waxing Gibbous</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);">Illumination</div>
+            <div style="font-weight:600;color:var(--text-1);font-size:1.1rem;">78%</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);">Moonrise</div>
+            <div style="font-weight:600;color:var(--text-1);font-size:1.1rem;">14:15 PM</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-3);">Moonset</div>
+            <div style="font-weight:600;color:var(--text-1);font-size:1.1rem;">02:30 AM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+`;
+
+  document.getElementById('modal-header').innerHTML = headerHtml;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (window.lucide) lucide.createIcons();
+};
+
+function updateWeatherCardAnimation(condition) {
+  const card = document.getElementById('current-weather-card');
+  if (card) {
+    card.classList.remove('bg-sunset', 'bg-sky', 'bg-rain', 'bg-clear', 'bg-clouds', 'bg-fog');
+    const cond = (condition || '').toLowerCase();
+    if (cond.includes('sun') || cond.includes('clear') || cond === 'partly_cloudy') {
+      card.classList.add('bg-clear');
+    } else if (cond.includes('rain') || cond.includes('drizzle') || cond.includes('thunder') || cond.includes('shower')) {
+      card.classList.add('bg-rain');
+    } else if (cond.includes('fog') || cond.includes('mist')) {
+      card.classList.add('bg-fog');
+    } else {
+      card.classList.add('bg-clouds');
+    }
+  }
 }

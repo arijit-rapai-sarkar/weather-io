@@ -5,79 +5,79 @@
 /* ── Google Fonts ───────────────────────────────────────────── */
 /* Fonts are now loaded in index.html for performance */
 
-/* ── Design Tokens — Light Theme (Default) ────────────────── */
+/* ── Design Tokens — Light Theme (Material You Expressive) ────────── */
 :root, [data-theme="light"] {
   /* Surfaces */
-  --bg:          #E8F2F3; /* Very soft mint/cyan tint for the global background */
+  --bg:          #F4F8FE; /* Very light tinted background */
   --surface:     #FFFFFF; /* White cards */
-  --surface-2:   #F8FAFC;
-  --surface-3:   #F1F5F9;
+  --surface-2:   #E4EEFA; /* Secondary container */
+  --surface-3:   #D0E0F0;
   --border:      transparent;
-  --border-2:    #E2E8F0;
+  --border-2:    #D1D6DC;
 
   /* Text */
-  --text-1:      #1E293B; /* Navy/Slate */
-  --text-2:      #64748B;
-  --text-3:      #94A3B8;
+  --text-1:      #131D26; /* Dark on-surface */
+  --text-2:      #3E4852; /* On-surface variant */
+  --text-3:      #707882;
 
   /* Brand / Accent */
-  --primary:        #0F172A; /* Dark for contrast */
-  --primary-light:  #F1F5F9;
-  --accent:         #FF8A00; /* Vibrant Orange */
+  --primary:        #006494; /* Expressive Blue */
+  --primary-light:  #CBE6FF; /* Primary container */
+  --accent:         #D65A31; /* Vibrant contrasting orange/red */
 
-  --shadow-sm:   0 2px 4px rgba(0,0,0,0.02);
-  --shadow-md:   0 4px 12px rgba(0,0,0,0.05);
-  --shadow-lg:   0 12px 24px rgba(15,23,42,0.06);
-  --shadow-xl:   0 20px 48px rgba(15,23,42,0.08);
+  --shadow-sm:   0 2px 4px rgba(0,0,0,0.03);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg:   0 12px 24px rgba(0,32,77,0.08);
+  --shadow-xl:   0 24px 48px rgba(0,32,77,0.12);
 
   /* Layout */
-  --sidebar-w:       80px; /* Thin icon sidebar */
-  --topbar-h:        80px;
-  --mobile-nav-h:    64px;
+  --sidebar-w:       88px; /* Slightly wider for MD3 */
+  --topbar-h:        88px;
+  --mobile-nav-h:    80px; /* Taller bottom nav */
   --content-max:     1400px;
 
-  /* Radius */
-  --radius-xs:   8px;
-  --radius-sm:   12px;
-  --radius-md:   16px;
-  --radius-lg:   24px;
-  --radius-xl:   32px;
+  /* Radius (Material 3 Shapes) */
+  --radius-xs:   12px;
+  --radius-sm:   16px;
+  --radius-md:   24px;
+  --radius-lg:   32px;
+  --radius-xl:   40px;
 
   /* Typography */
   --font-body:    'Quicksand', -apple-system, sans-serif;
   --font-heading: 'Poppins', -apple-system, sans-serif;
 
   --skeleton-base:  #E2E8F0;
-  --skeleton-shine: #F1F5F9;
+  --skeleton-shine: #F8FAFC;
 }
 
-/* ── Design Tokens — Dark Theme ─────────────────────────────── */
+/* ── Design Tokens — Dark Theme (Material You Expressive) ─────────── */
 [data-theme="dark"] {
   /* Surfaces */
-  --bg:          #0F172A; /* Very dark slate for global background */
-  --surface:     #1E293B; /* Dark slate cards */
-  --surface-2:   #0B1120;
-  --surface-3:   #334155;
-  --border:      #334155;
-  --border-2:    #475569;
+  --bg:          #101418; /* Dark surface */
+  --surface:     #1C2127; /* Surface container low */
+  --surface-2:   #282F37; /* Surface container */
+  --surface-3:   #353E48;
+  --border:      transparent;
+  --border-2:    #434C56;
 
   /* Text */
-  --text-1:      #F8FAFC; /* Light Slate */
-  --text-2:      #CBD5E1;
-  --text-3:      #94A3B8;
+  --text-1:      #E1E3E6; /* Light on-surface */
+  --text-2:      #BAC0C7; /* On-surface variant */
+  --text-3:      #8D949C;
 
   /* Brand / Accent */
-  --primary:        #60A5FA; /* Light Blue for contrast */
-  --primary-light:  #1E3A8A;
-  --accent:         #FF8A00; /* Vibrant Orange */
+  --primary:        #8BCAFF; /* Light blue primary */
+  --primary-light:  #004B73; /* Dark primary container */
+  --accent:         #FFB499; /* Soft contrast orange */
 
-  --shadow-sm:   0 2px 4px rgba(0,0,0,0.2);
-  --shadow-md:   0 4px 12px rgba(0,0,0,0.3);
-  --shadow-lg:   0 12px 24px rgba(0,0,0,0.4);
-  --shadow-xl:   0 20px 48px rgba(0,0,0,0.5);
+  --shadow-sm:   0 2px 4px rgba(0,0,0,0.3);
+  --shadow-md:   0 8px 16px rgba(0,0,0,0.4);
+  --shadow-lg:   0 16px 32px rgba(0,0,0,0.5);
+  --shadow-xl:   0 24px 64px rgba(0,0,0,0.6);
 
-  --skeleton-base:  #334155;
-  --skeleton-shine: #475569;
+  --skeleton-base:  #282F37;
+  --skeleton-shine: #353E48;
 }
 
 /* ── Reset & Base ───────────────────────────────────────────── */
@@ -215,22 +215,7 @@ p  { font-size: 0.875rem; color: var(--text-2); }
 
 .nav-item.active svg { color: var(--primary); }
 
-/* Dark mode sidebar icon overrides */
-[data-theme="dark"] .nav-item {
-  color: #CBD5E1; /* explicitly light slate for visibility */
-}
-[data-theme="dark"] .nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #F8FAFC; /* pure white on hover */
-}
-[data-theme="dark"] .nav-item.active {
-  background: var(--accent);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-[data-theme="dark"] .nav-item.active svg { 
-  color: white; 
-}
+/* Dark mode sidebar icon overrides removed - utilizing native CSS variables instead */
 
 .sidebar-footer {
   padding: 12px 10px;
@@ -488,10 +473,10 @@ p  { font-size: 0.875rem; color: var(--text-2); }
   border: 1px solid var(--ext-border);
 }
 
-.badge-success  { background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0; }
-.badge-warning  { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
-.badge-danger   { background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; }
-.badge-info     { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+.badge-success  { background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.badge-warning  { background: rgba(245, 158, 11, 0.15); color: #F59E0B; border: 1px solid rgba(245, 158, 11, 0.3); }
+.badge-danger   { background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+.badge-info     { background: rgba(59, 130, 246, 0.15); color: #3B82F6; border: 1px solid rgba(59, 130, 246, 0.3); }
 
 /* ── Skeleton ───────────────────────────────────────────────── */
 .skel-line { height: 14px; border-radius: 4px; margin-bottom: 8px; }
@@ -1847,25 +1832,65 @@ p  { font-size: 0.875rem; color: var(--text-2); }
   border: none;
 }
 
-/* Background Images with Specific Zooming to hide AI frames */
+/* Dynamic Animated Weather Backgrounds */
 .bg-sunset {
-  background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)), url('../images/bg_sunset.png');
-  background-color: #F8B195;
-  background-size: cover;
-  background-position: center;
-}
-.bg-sky {
-  background-image: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.4)), url('../images/bg_sky_kites.png');
-  background-color: #92B2D1;
-  background-size: cover;
-  background-position: center;
-}
-.bg-rain {
-  background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('../images/bg_rain_umbrella.png');
-  background-color: #D4E3A4;
+  background: linear-gradient(-45deg, #FF7E5F, #FEB47B, #4A6FA5, #D48B77);
+  background-size: 400% 400%;
+  animation: gradientShimmer 12s ease infinite;
   color: white;
-  background-size: cover;
-  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+@keyframes gradientShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.bg-sky {
+  background: linear-gradient(135deg, #56CCF2, #2F80ED, #00C6FF, #0072FF);
+  background-size: 400% 400%;
+  animation: gradientShimmer 10s ease infinite reverse;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.bg-sky::before {
+  content: "";
+  position: absolute;
+  top: -50%; left: -50%; right: -50%; bottom: -50%;
+  background-image: 
+    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.4) 0%, transparent 20%),
+    radial-gradient(ellipse at 20% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 40%);
+  background-size: 100% 100%;
+  animation: driftClouds 15s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes driftClouds {
+  0% { transform: scale(1) translate(0px, 0px); opacity: 0.6; }
+  100% { transform: scale(1.2) translate(-30px, 15px); opacity: 1; }
+}
+
+.bg-rain {
+  background: linear-gradient(180deg, #1C2938, #2C3E50, #3498DB);
+  background-size: 400% 400%;
+  animation: gradientShimmer 15s ease infinite;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.bg-rain::before {
+  content: "";
+  position: absolute;
+  top: -100%; left: -100%; width: 300%; height: 300%;
+  background-image: repeating-linear-gradient(20deg, transparent, transparent 15px, rgba(255,255,255,0.15) 15px, rgba(255,255,255,0.15) 17px);
+  background-size: 200% 200%;
+  animation: heavyRainDrop 0.8s linear infinite;
+  pointer-events: none;
+}
+@keyframes heavyRainDrop {
+  0% { transform: translateY(0) translateX(0); }
+  100% { transform: translateY(15%) translateX(-7.5%); }
 }
 
 /* Card Internal Layout */
@@ -1875,7 +1900,7 @@ p  { font-size: 0.875rem; color: var(--text-2); }
 
 .wh-middle { margin-top: 40px; display: flex; align-items: center; gap: 16px; }
 .wh-temp { font-size: 3.5rem; font-weight: 700; line-height: 1; display: flex; align-items: flex-start; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
-.wh-badge { padding: 4px 12px; background: white; color: var(--text-1); border-radius: 99px; font-weight: 700; font-size: 0.875rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.wh-badge { padding: 4px 12px; background: rgba(255, 255, 255, 0.25); color: white; border-radius: 99px; font-weight: 700; font-size: 0.875rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .wh-condition { font-weight: 600; font-size: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
 
 /* specific readable text shadow for text on the rain card */
@@ -1888,12 +1913,12 @@ p  { font-size: 0.875rem; color: var(--text-2); }
 .wh-chip { display: flex; flex-direction: column; gap: 4px; padding: 12px 16px; border-radius: 16px; flex: 1; font-size: 0.75rem; font-weight: 500; }
 .wh-chip span { opacity: 0.9; }
 .wh-chip strong { font-size: 1rem; font-weight: 700; }
-.wh-chip.dark { background: #262D42; color: white; }
-.wh-chip.green { background: #CDE66A; color: #1E293B; }
-.wh-chip.white { background: white; color: #1E293B; }
+.wh-chip.dark { background: rgba(0, 0, 0, 0.25); color: white; }
+.wh-chip.green { background: rgba(205, 230, 106, 0.9); color: #1E293B; }
+.wh-chip.white { background: rgba(255, 255, 255, 0.25); color: white; }
 
 /* AQI Bar */
-.aqi-bar-container { width: 100%; background: white; padding: 16px; border-radius: 16px; color: var(--text-1); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.aqi-bar-container { width: 100%; background: var(--surface-2); padding: 16px; border-radius: 16px; color: var(--text-1); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 .aqi-labels { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; margin-bottom: 12px; color: var(--text-2); }
 .aqi-bar-track { width: 100%; height: 6px; background: #E2E8F0; border-radius: 99px; position: relative; }
 .aqi-bar-fill { height: 100%; background: linear-gradient(90deg, #10B981, #F59E0B, #EF4444); border-radius: 99px; }
@@ -1962,3 +1987,62 @@ p  { font-size: 0.875rem; color: var(--text-2); }
   }
 }
 
+
+/* Dynamic Weather Card Backgrounds */
+.bg-clear {
+  background: linear-gradient(135deg, #FFB75E, #ED8F03, #4A90E2, #56CCF2);
+  background-size: 400% 400%;
+  animation: gradientShimmer 12s ease infinite;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.bg-clear::before {
+  content: "";
+  position: absolute;
+  top: -50%; left: -50%; right: -50%; bottom: -50%;
+  background-image: radial-gradient(circle at center, rgba(255, 255, 255, 0.4) 0%, transparent 40%);
+  background-size: 150% 150%;
+  animation: driftClouds 20s linear infinite alternate;
+  pointer-events: none;
+}
+
+.bg-clouds {
+  background: linear-gradient(135deg, #8E9EAB, #EEF2F3, #606C88, #3F4C6B);
+  background-size: 400% 400%;
+  animation: gradientShimmer 15s ease infinite;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+.bg-clouds::before {
+  content: "";
+  position: absolute;
+  top: -50%; left: -50%; right: -50%; bottom: -50%;
+  background-image: 
+    radial-gradient(circle at 70% 30%, rgba(255, 255, 255, 0.25) 0%, transparent 30%),
+    radial-gradient(ellipse at 30% 70%, rgba(255, 255, 255, 0.15) 0%, transparent 40%);
+  background-size: 100% 100%;
+  animation: driftClouds 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.bg-fog {
+  background: linear-gradient(180deg, #9ca2a8, #b8c6db, #f5f7fa, #d7e1ec);
+  background-size: 400% 400%;
+  animation: gradientShimmer 18s ease infinite;
+  color: #333;
+  position: relative;
+  overflow: hidden;
+}
+.bg-fog::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%; right: -100%; bottom: 0;
+  background-image: 
+    linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent),
+    linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
+  background-size: 200% 100%, 150% 100%;
+  animation: driftClouds 15s linear infinite alternate;
+  pointer-events: none;
+}
