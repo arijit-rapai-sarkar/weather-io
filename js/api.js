@@ -109,8 +109,91 @@ const API = (() => {
    * @param {{ city, state, country, lat, lng }} locationObj
    */
   async function getExternalWeather(locationObj) {
+    try {
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${locationObj.lat}&longitude=${locationObj.lng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,wind_speed_10m,surface_pressure&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max&timezone=auto`;
+      const res = await fetch(url);
+      const data = await res.json();
+      
+      const mapCode = (code) => {
+        if (code === 0) return 'sunny';
+        if (code === 1 || code === 2) return 'partly_cloudy';
+        if (code === 3) return 'cloudy';
+        if (code >= 45 && code <= 48) return 'foggy';
+        if (code >= 51 && code <= 55) return 'drizzle';
+        if (code >= 61 && code <= 65) return 'rainy';
+        if (code >= 71 && code <= 77) return 'snowy';
+        if (code >= 80 && code <= 82) return 'heavy_rain';
+        if (code >= 95 && code <= 99) return 'thunderstorm';
+        return 'sunny';
+      };
+
+      const c = data.current;
+      const d = data.daily;
+      const h = data.hourly;
+      
+      const daily = d.time.map((t, i) => {
+        const dateObj = new Date(t);
+        const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+        return {
+          date: dateObj.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
+          day: i === 0 ? 'Today' : i === 1 ? 'Tomorrow' : dayNames[dateObj.getDay()],
+          condition: mapCode(d.weather_code[i]),
+          high: Math.round(d.temperature_2m_max[i]),
+          low: Math.round(d.temperature_2m_min[i]),
+          rainProbability: d.precipitation_probability_max[i],
+          humidity: 60,
+          wind: Math.round(d.wind_speed_10m_max[i])
+        };
+      }).slice(0, 7);
+
+      const currentHourIdx = h.time.findIndex(t => new Date(t) > new Date()) || 0;
+      const hourly = [];
+      for (let i = 0; i < 24; i++) {
+        const idx = currentHourIdx + i;
+        if (idx >= h.time.length) break;
+        const timeStr = new Date(h.time[idx]).getHours();
+        hourly.push({
+          hour: timeStr,
+          time: `${String(timeStr).padStart(2, '0')}:00`,
+          condition: mapCode(h.weather_code[idx]),
+          temperature: Math.round(h.temperature_2m[idx]),
+          humidity: h.relative_humidity_2m[idx],
+          rainProbability: h.precipitation_probability[idx],
+          windSpeed: h.wind_speed_10m[idx],
+          pressure: h.surface_pressure[idx],
+          confidence: 90,
+          isNow: i === 0
+        });
+      }
+
+      return {
+        source: 'external',
+        location: locationObj,
+        current: {
+          temperature: Math.round(c.temperature_2m),
+          feelsLike: Math.round(c.apparent_temperature),
+          humidity: c.relative_humidity_2m,
+          condition: mapCode(c.weather_code),
+          windSpeed: c.wind_speed_10m,
+          windDirection: 'N',
+          pressure: c.surface_pressure,
+          visibility: 10,
+          aqi: 50,
+          aqiInfo: window.aqiCategory ? window.aqiCategory(50) : {label:'Good'},
+          uvIndex: 5,
+          uvInfo: window.uvCategory ? window.uvCategory(5) : {label:'Moderate'},
+          rain: c.precipitation > 0,
+          rainfallMm: c.precipitation,
+          city: locationObj.city
+        },
+        hourly,
+        daily,
+        fetchedAt: new Date()
+      };
+    } catch (e) {
+      console.warn("Open-Meteo failed, using mock", e);
+    }
     await delay(MOCK_DELAY.ext);
-    // return apiFetch(`${ENDPOINTS.externalWeather}?lat=${locationObj.lat}&lng=${locationObj.lng}`);
     return MockData.getExternalWeather(locationObj);
   }
 
@@ -119,8 +202,20 @@ const API = (() => {
    * @param {string} query
    */
   async function searchLocations(query) {
+    try {
+      const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=8`);
+      const data = await res.json();
+      if (data.results) {
+        return data.results.map(r => ({
+          city: r.name,
+          state: r.admin1 || '',
+          country: r.country,
+          lat: r.latitude,
+          lng: r.longitude
+        }));
+      }
+    } catch(e) { console.warn(e); }
     await delay(MOCK_DELAY.search);
-    // return apiFetch(`${ENDPOINTS.searchLocation}?q=${encodeURIComponent(query)}`);
     return MockData.searchCities(query);
   }
 

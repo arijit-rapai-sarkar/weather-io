@@ -259,14 +259,14 @@
               <div class="card-header-flex">
                 <h3>How's the<br>temperature today?</h3>
                 <div class="chart-filters">
-                  <button class="icon-btn active" style="background:var(--accent);color:white"><i data-lucide="thermometer"></i></button>
-                  <button class="icon-btn"><i data-lucide="umbrella"></i></button>
-                  <button class="icon-btn"><i data-lucide="wind"></i></button>
+                  <button class="icon-btn active" data-metric="temperature" onclick="setChartMetric('temperature')" style="background:var(--accent);color:white;cursor:pointer;border:none;"><i data-lucide="thermometer"></i></button>
+                  <button class="icon-btn" data-metric="rain" onclick="setChartMetric('rain')" style="cursor:pointer;border:none;background:var(--surface-2);"><i data-lucide="umbrella"></i></button>
+                  <button class="icon-btn" data-metric="wind" onclick="setChartMetric('wind')" style="cursor:pointer;border:none;background:var(--surface-2);"><i data-lucide="wind"></i></button>
                 </div>
               </div>
-              <div class="chart-mockup">
+              <div class="chart-mockup" id="main-temp-chart-container" style="margin-top:20px;height:140px;">
                 <!-- A simple SVG or placeholder for the spline chart -->
-                <div class="skeleton skel-block" style="height:120px;width:100%;background:var(--surface-3);border-radius:12px;margin-top:20px;"></div>
+                <div class="skeleton skel-block" style="height:120px;width:100%;background:var(--surface-3);border-radius:12px;"></div>
               </div>
             </div>
 
@@ -274,7 +274,7 @@
             <div class="card tomorrow-card bg-rain">
               <div class="wh-top">
                 <span style="font-size:0.875rem">Tomorrow</span>
-                <h3 style="font-size:1.5rem;font-weight:700">Alam Barzah</h3>
+                <h3 style="font-size:1.5rem;font-weight:700">Local Forecast</h3>
               </div>
               <div class="wh-middle" style="margin-top:auto; padding-bottom:10px;">
                 <div class="wh-temp" style="color:var(--text-1);">20°C</div>
@@ -290,11 +290,11 @@
         <aside class="dashboard-right">
           
           <!-- Sun Widget -->
-          <div class="right-widget">
+          <div class="right-widget" id="sun-widget">
             <div class="rw-header">
               <div>
                 <h3 style="font-size:1.1rem">Sun</h3>
-                <span style="font-size:0.75rem;color:var(--text-3)">Banten, Indonesia</span>
+                <span style="font-size:0.75rem;color:var(--text-3)">Local Sensor Unit</span>
               </div>
               <div class="rw-temp" style="font-size:1.5rem;font-weight:700;color:var(--accent)">22°C</div>
             </div>
@@ -351,7 +351,7 @@
               </div>
             </div>
             
-            <button class="btn-primary" style="width:100%;margin-top:16px;border-radius:99px;padding:12px;background:var(--accent);color:white;font-weight:600;display:flex;justify-content:center;align-items:center;gap:8px;">
+            <button class="btn-primary" onclick="navigateTo('forecast')" style="width:100%;margin-top:16px;border-radius:99px;padding:12px;background:var(--accent);color:white;font-weight:600;display:flex;justify-content:center;align-items:center;gap:8px;cursor:pointer;border:none;">
               <i data-lucide="calendar"></i> Next 5 Days
             </button>
           </div>

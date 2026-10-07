@@ -51,6 +51,35 @@
   --skeleton-shine: #F1F5F9;
 }
 
+/* ── Design Tokens — Dark Theme ─────────────────────────────── */
+[data-theme="dark"] {
+  /* Surfaces */
+  --bg:          #0F172A; /* Very dark slate for global background */
+  --surface:     #1E293B; /* Dark slate cards */
+  --surface-2:   #0B1120;
+  --surface-3:   #334155;
+  --border:      #334155;
+  --border-2:    #475569;
+
+  /* Text */
+  --text-1:      #F8FAFC; /* Light Slate */
+  --text-2:      #CBD5E1;
+  --text-3:      #94A3B8;
+
+  /* Brand / Accent */
+  --primary:        #60A5FA; /* Light Blue for contrast */
+  --primary-light:  #1E3A8A;
+  --accent:         #FF8A00; /* Vibrant Orange */
+
+  --shadow-sm:   0 2px 4px rgba(0,0,0,0.2);
+  --shadow-md:   0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg:   0 12px 24px rgba(0,0,0,0.4);
+  --shadow-xl:   0 20px 48px rgba(0,0,0,0.5);
+
+  --skeleton-base:  #334155;
+  --skeleton-shine: #475569;
+}
+
 /* ── Reset & Base ───────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -168,6 +197,7 @@ p  { font-size: 0.875rem; color: var(--text-2); }
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
@@ -184,6 +214,23 @@ p  { font-size: 0.875rem; color: var(--text-2); }
 }
 
 .nav-item.active svg { color: var(--primary); }
+
+/* Dark mode sidebar icon overrides */
+[data-theme="dark"] .nav-item {
+  color: #CBD5E1; /* explicitly light slate for visibility */
+}
+[data-theme="dark"] .nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #F8FAFC; /* pure white on hover */
+}
+[data-theme="dark"] .nav-item.active {
+  background: var(--accent);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+[data-theme="dark"] .nav-item.active svg { 
+  color: white; 
+}
 
 .sidebar-footer {
   padding: 12px 10px;
@@ -1814,9 +1861,9 @@ p  { font-size: 0.875rem; color: var(--text-2); }
   background-position: center;
 }
 .bg-rain {
-  background-image: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.8)), url('../images/bg_rain_umbrella.png');
+  background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url('../images/bg_rain_umbrella.png');
   background-color: #D4E3A4;
-  color: var(--text-1);
+  color: white;
   background-size: cover;
   background-position: center;
 }
@@ -1831,9 +1878,10 @@ p  { font-size: 0.875rem; color: var(--text-2); }
 .wh-badge { padding: 4px 12px; background: white; color: var(--text-1); border-radius: 99px; font-weight: 700; font-size: 0.875rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 .wh-condition { font-weight: 600; font-size: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.4); }
 
-/* specific readable text shadow for dark text on the rain card */
+/* specific readable text shadow for text on the rain card */
 .tomorrow-card .wh-top span, .tomorrow-card .wh-top h3, .tomorrow-card .wh-temp, .tomorrow-card .wh-condition {
-  text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,1);
+  text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+  color: white !important;
 }
 
 .wh-bottom { display: flex; gap: 12px; margin-top: auto; padding-top: 20px; }

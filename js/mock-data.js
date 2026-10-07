@@ -916,7 +916,7 @@ const MockData = {
       deviceId:        'WX-IOT-001',
       firmwareVersion: '3.2.1',
       batteryLevel:    87,
-      location:        { lat:24.1768, lng:88.2712, city:'Murshidabad', state:'West Bengal', country:'India' },
+      location:        { lat:24.1768, lng:88.2712, city:'Live IoT Sensor', state:'Connected', country:'Local Network' },
       current: {
         temperature:    28.4,
         humidity:       71,

@@ -8,67 +8,67 @@
 
 // ── Application state ──────────────────────────────────────
 const state = {
-  currentPage:        'dashboard',
-  theme:              localStorage.getItem('wiq-theme') || 'light',
-  iotData:            null,
-  aiPrediction:       null,
-  externalWeather:    null,
-  savedLocations:     [],
-  searchQuery:        '',
-  isLoading:          true,
-  iotPollingTimer:    null,
-  searchDebounce:     null,
+  currentPage: 'dashboard',
+  theme: localStorage.getItem('wiq-theme') || 'light',
+  iotData: null,
+  aiPrediction: null,
+  externalWeather: null,
+  savedLocations: [],
+  searchQuery: '',
+  isLoading: true,
+  iotPollingTimer: null,
+  searchDebounce: null,
   // New state
-  weatherScore:       null,
-  activityScores:     null,
-  deviceHealth:       null,
-  anomalies:          null,
-  modelPerformance:   null,
-  aiVsActual:         null,
-  aiExplanation:      null,
-  historicalData:     null,
-  systemAnalytics:    null,
-  analyticsRange:     '24h',
-  analyticsSensor:    'temperature',
-  exportRange:        '24h',
-  notifPanelOpen:     false,
+  weatherScore: null,
+  activityScores: null,
+  deviceHealth: null,
+  anomalies: null,
+  modelPerformance: null,
+  aiVsActual: null,
+  aiExplanation: null,
+  historicalData: null,
+  systemAnalytics: null,
+  analyticsRange: '24h',
+  analyticsSensor: 'temperature',
+  exportRange: '24h',
+  notifPanelOpen: false,
   assistantPanelOpen: false,
-  demoMode:           false,
-  demoScenario:       null,
-  aiLabTab:           'performance',
-  settingsTab:        'general',
-  mapLayer:           'station',
-  notifFilter:        'all',
-  lastUpdatedAt:      null,
+  demoMode: false,
+  demoScenario: null,
+  aiLabTab: 'performance',
+  settingsTab: 'general',
+  mapLayer: 'station',
+  notifFilter: 'all',
+  lastUpdatedAt: null,
 };
 
 // ── Sensor definitions ─────────────────────────────────────
 const SENSORS = [
-  { key:'temperature', label:'Temperature', icon:'🌡️',  unit:'°C',   color:'#EF4444', sparkColor:'#EF4444' },
-  { key:'humidity',    label:'Humidity',    icon:'💧',   unit:'%',    color:'#3B82F6', sparkColor:'#3B82F6' },
-  { key:'windSpeed',   label:'Wind Speed',  icon:'💨',   unit:'km/h', color:'#6366F1', sparkColor:'#6366F1' },
-  { key:'rain',        label:'Rainfall',    icon:'🌧️',  unit:'mm',   color:'#0EA5E9', sparkColor:'#0EA5E9' },
-  { key:'aqi',         label:'Air Quality', icon:'🫁',   unit:'AQI',  color:'#F59E0B', sparkColor:'#F59E0B' },
-  { key:'uvIndex',     label:'UV Index',    icon:'☀️',   unit:'UV',   color:'#F97316', sparkColor:'#F97316' },
-  { key:'pressure',    label:'Pressure',    icon:'🌬️',  unit:'hPa',  color:'#8B5CF6', sparkColor:'#8B5CF6' },
-  { key:'visibility',  label:'Visibility',  icon:'👁️',  unit:'km',   color:'#10B981', sparkColor:'#10B981' },
+  { key: 'temperature', label: 'Temperature', icon: '🌡️', unit: '°C', color: '#EF4444', sparkColor: '#EF4444' },
+  { key: 'humidity', label: 'Humidity', icon: '💧', unit: '%', color: '#3B82F6', sparkColor: '#3B82F6' },
+  { key: 'windSpeed', label: 'Wind Speed', icon: '💨', unit: 'km/h', color: '#6366F1', sparkColor: '#6366F1' },
+  { key: 'rain', label: 'Rainfall', icon: '🌧️', unit: 'mm', color: '#0EA5E9', sparkColor: '#0EA5E9' },
+  { key: 'aqi', label: 'Air Quality', icon: '🫁', unit: 'AQI', color: '#F59E0B', sparkColor: '#F59E0B' },
+  { key: 'uvIndex', label: 'UV Index', icon: '☀️', unit: 'UV', color: '#F97316', sparkColor: '#F97316' },
+  { key: 'pressure', label: 'Pressure', icon: '🌬️', unit: 'hPa', color: '#8B5CF6', sparkColor: '#8B5CF6' },
+  { key: 'visibility', label: 'Visibility', icon: '👁️', unit: 'km', color: '#10B981', sparkColor: '#10B981' },
 ];
 
 // Source badge helpers
 const SOURCE_BADGES = {
-  iot:      '<span class="badge badge-iot" style="font-size:0.6rem">● LIVE IoT</span>',
-  ai:       '<span class="badge badge-ai" style="font-size:0.6rem">⬡ AI PREDICTED</span>',
-  ext:      '<span class="badge badge-ext" style="font-size:0.6rem">↗ EXTERNAL</span>',
-  cached:   '<span class="badge badge-warning" style="font-size:0.6rem">⏱ CACHED</span>',
-  demo:     '<span style="padding:2px 6px;background:#F59E0B;color:white;border-radius:99px;font-size:0.6rem;font-weight:700">🎭 DEMO</span>',
+  iot: '<span class="badge badge-iot" style="font-size:0.6rem">● LIVE IoT</span>',
+  ai: '<span class="badge badge-ai" style="font-size:0.6rem">⬡ AI PREDICTED</span>',
+  ext: '<span class="badge badge-ext" style="font-size:0.6rem">↗ EXTERNAL</span>',
+  cached: '<span class="badge badge-warning" style="font-size:0.6rem">⏱ CACHED</span>',
+  demo: '<span style="padding:2px 6px;background:#F59E0B;color:white;border-radius:99px;font-size:0.6rem;font-weight:700">🎭 DEMO</span>',
 };
 
 // ── DOM helpers ────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const $$ = sel => document.querySelectorAll(sel);
 
-function show(el)   { if (el) el.hidden = false; }
-function hide(el)   { if (el) el.hidden = true; }
+function show(el) { if (el) el.hidden = false; }
+function hide(el) { if (el) el.hidden = true; }
 function setText(id, val) { const el = $(id); if (el) el.textContent = val; }
 
 function timeAgo(date) {
@@ -118,8 +118,10 @@ function updateWeatherBackground(condition) {
   bg.innerHTML = '';
   bg.className = 'weather-bg';
 
-  const now = new Date().getHours();
-  const isNight = now < 6 || now >= 20;
+  const lat = state.iotData?.location?.lat || 22.738318;
+  const lon = state.iotData?.location?.lng || 88.479709;
+  const pos = calculateSolarPosition(new Date(), lat, lon);
+  const isNight = pos.elevation < 0;
 
   if (isNight) {
     bg.classList.add('night');
@@ -191,15 +193,15 @@ function navigateTo(page) {
   });
 
   // Page-specific renders
-  if (page === 'sensors')      renderSensorsPage();
-  if (page === 'ai')           renderAIPage();
-  if (page === 'ailab')        renderAILabPage();
-  if (page === 'forecast')     renderForecastPage();
+  if (page === 'sensors') renderSensorsPage();
+  if (page === 'ai') renderAIPage();
+  if (page === 'ailab') renderAILabPage();
+  if (page === 'forecast') renderForecastPage();
   if (page === 'intelligence') renderIntelligencePage();
-  if (page === 'analytics')    renderAnalyticsPage();
-  if (page === 'map')          renderMapPage();
-  if (page === 'saved')        renderSavedLocations();
-  if (page === 'settings')     renderSettings();
+  if (page === 'analytics') renderAnalyticsPage();
+  if (page === 'map') renderMapPage();
+  if (page === 'saved') renderSavedLocations();
+  if (page === 'settings') renderSettings();
 
   const content = $('page-content');
   if (content) content.scrollTop = 0;
@@ -207,29 +209,29 @@ function navigateTo(page) {
 
 // ── IoT Status rendering ───────────────────────────────────
 function renderIoTStatus(data) {
-  const bar  = $('iot-status-bar');
-  const dot  = $('iot-dot');
+  const bar = $('iot-status-bar');
+  const dot = $('iot-dot');
   const text = $('iot-status-text');
   const time = $('iot-update-time');
   if (!bar) return;
 
   const statusMap = {
-    connected: { dotClass:'connected', label:'IoT Connected',  barClass:'' },
-    syncing:   { dotClass:'syncing',   label:'Syncing…',        barClass:'syncing' },
-    offline:   { dotClass:'offline',   label:'Device Offline',  barClass:'offline' },
-    error:     { dotClass:'error',     label:'Sensor Error',    barClass:'error' },
+    connected: { dotClass: 'connected', label: 'IoT Connected', barClass: '' },
+    syncing: { dotClass: 'syncing', label: 'Syncing…', barClass: 'syncing' },
+    offline: { dotClass: 'offline', label: 'Device Offline', barClass: 'offline' },
+    error: { dotClass: 'error', label: 'Sensor Error', barClass: 'error' },
   };
 
   const s = statusMap[data.status] || statusMap.connected;
-  dot.className  = `iot-dot ${s.dotClass}`;
+  dot.className = `iot-dot ${s.dotClass}`;
   text.textContent = s.label;
-  bar.className  = `iot-status-bar ${s.barClass}`;
+  bar.className = `iot-status-bar ${s.barClass}`;
   time.textContent = data.lastUpdate ? timeAgo(data.lastUpdate) : '';
 }
 
 // ── Location rendering ─────────────────────────────────────
 function renderLocation(loc) {
-  setText('location-city',   loc.city);
+  setText('location-city', loc.city);
   setText('location-detail', `${loc.state}, ${loc.country}`);
 }
 
@@ -241,28 +243,28 @@ function renderCurrentWeather(data) {
 
   const c = data.current;
   setText('cw-condition', getWeatherLabel(c.condition));
-  setText('cw-icon',      getWeatherIcon(c.condition));
-  setText('cw-temp',      Math.round(c.temperature));
-  setText('cw-feels',     `${Math.round(c.feelsLike)}°C`);
-  setText('cw-humidity',  `${c.humidity}%`);
-  setText('cw-wind',      `${c.windSpeed} km/h ${c.windDirection}`);
-  setText('cw-vis',       `${c.visibility} km`);
-  setText('cw-pressure',  `${c.pressure} hPa`);
+  setText('cw-icon', getWeatherIcon(c.condition));
+  setText('cw-temp', Math.round(c.temperature));
+  setText('cw-feels', `${Math.round(c.feelsLike)}°C`);
+  setText('cw-humidity', `${c.humidity}%`);
+  setText('cw-wind', `${c.windSpeed} km/h ${c.windDirection}`);
+  setText('cw-vis', `${c.visibility} km`);
+  setText('cw-pressure', `${c.pressure} hPa`);
 
   // NEW: Conditions summary grid (5 extra parameters)
   const sumEl = $('conditions-summary');
   if (sumEl) {
     const items = [
-      { icon:'🌡️', label:'Temp',      value:`${c.temperature}°C`,   source:'IoT' },
-      { icon:'💧', label:'Humidity',   value:`${c.humidity}%`,        source:'IoT' },
-      { icon:'🫁', label:'AQI',        value:`${c.aqi}`,              source:'IoT' },
-      { icon:'☀️', label:'UV',         value:`${c.uvIndex}`,          source:'IoT' },
-      { icon:'🌬️', label:'Pressure',  value:`${c.pressure} hPa`,    source:'IoT' },
-      { icon:'💨', label:'Wind',       value:`${c.windSpeed} km/h`,   source:'IoT' },
-      { icon:'🌧️', label:'Rain %',    value:`${c.rainProbability || 0}%`, source:'AI' },
-      { icon:'👁️', label:'Visibility', value:`${c.visibility} km`,   source:'IoT' },
-      { icon:'🌡️', label:'Dew Point',  value:`${c.dewPoint || '—'}°C`, source:'IoT' },
-      { icon:'⬆️', label:'Trend',      value:c.pressureTrend || '—', source:'IoT' },
+      { icon: '🌡️', label: 'Temp', value: `${c.temperature}°C`, source: 'IoT' },
+      { icon: '💧', label: 'Humidity', value: `${c.humidity}%`, source: 'IoT' },
+      { icon: '🫁', label: 'AQI', value: `${c.aqi}`, source: 'IoT' },
+      { icon: '☀️', label: 'UV', value: `${c.uvIndex}`, source: 'IoT' },
+      { icon: '🌬️', label: 'Pressure', value: `${c.pressure} hPa`, source: 'IoT' },
+      { icon: '💨', label: 'Wind', value: `${c.windSpeed} km/h`, source: 'IoT' },
+      { icon: '🌧️', label: 'Rain %', value: `${c.rainProbability || 0}%`, source: 'AI' },
+      { icon: '👁️', label: 'Visibility', value: `${c.visibility} km`, source: 'IoT' },
+      { icon: '🌡️', label: 'Dew Point', value: `${c.dewPoint || '—'}°C`, source: 'IoT' },
+      { icon: '⬆️', label: 'Trend', value: c.pressureTrend || '—', source: 'IoT' },
     ];
     sumEl.innerHTML = items.slice(0, 5).map(it => `
       <div class="cs-item">
@@ -306,14 +308,14 @@ async function renderWeatherScore(iotData) {
         <div class="ws-right">
           <div class="ws-factors">
             ${score.factors.map(f => {
-              const barColor = f.value >= 70 ? '#10B981' : f.value >= 50 ? '#3B82F6' : f.value >= 30 ? '#F59E0B' : '#EF4444';
-              return `
+      const barColor = f.value >= 70 ? '#10B981' : f.value >= 50 ? '#3B82F6' : f.value >= 30 ? '#F59E0B' : '#EF4444';
+      return `
               <div class="ws-factor">
                 <div class="ws-factor-name">${f.icon} ${f.name}</div>
                 <div>${Charts.scoreBar(f.value, 100, { color: barColor, w: 80, h: 6 })}</div>
                 <div class="ws-factor-val">${f.detail}</div>
               </div>`;
-            }).join('')}
+    }).join('')}
           </div>
           <div class="ws-explanation">${score.explanation}</div>
         </div>
@@ -362,32 +364,156 @@ function renderWeatherTimeline(aiPrediction) {
     </div>`).join('');
 }
 
+function calculateSolarPosition(date, lat, lon) {
+  const t = date.getTime() / 1000;
+  const n = (t / 86400.0) - 10957.5;
+  const L = (280.460 + 0.9856474 * n) % 360.0;
+  const g = (357.528 + 0.9856003 * n) % 360.0;
+  const lambda_ = L + 1.915 * Math.sin(g * Math.PI / 180) + 0.020 * Math.sin(2 * g * Math.PI / 180);
+  const epsilon = 23.439 - 0.0000004 * n;
+  const delta = Math.asin(Math.sin(epsilon * Math.PI / 180) * Math.sin(lambda_ * Math.PI / 180));
+  let alpha = Math.atan2(Math.cos(epsilon * Math.PI / 180) * Math.sin(lambda_ * Math.PI / 180), Math.cos(lambda_ * Math.PI / 180)) * 180 / Math.PI;
+  alpha = alpha % 360.0;
+  if (alpha < 0) alpha += 360;
+  let GMST = (280.46061837 + 360.98564736629 * n) % 360.0;
+  if (GMST < 0) GMST += 360;
+  let LST = (GMST + lon) % 360.0;
+  if (LST < 0) LST += 360;
+  let H = (LST - alpha) % 360.0;
+  if (H > 180.0) H -= 360.0;
+  else if (H < -180.0) H += 360.0;
+  const lat_rad = lat * Math.PI / 180.0;
+  const H_rad = H * Math.PI / 180.0;
+  const el_rad = Math.asin(Math.sin(lat_rad) * Math.sin(delta) + Math.cos(lat_rad) * Math.cos(delta) * Math.cos(H_rad));
+  const elevation = el_rad * 180 / Math.PI;
+  const az_rad = Math.atan2(Math.sin(H_rad), Math.cos(H_rad) * Math.sin(lat_rad) - Math.tan(delta) * Math.cos(lat_rad));
+  let azimuth = (az_rad * 180 / Math.PI) + 180.0;
+  if (azimuth >= 360) azimuth -= 360;
+  if (azimuth < 0) azimuth += 360;
+  return { azimuth, elevation };
+}
+
+function calculateMoonPosition(date, lat, lon) {
+  const t = date.getTime() / 1000;
+  const n = (t / 86400.0) - 10957.5;
+  
+  const L = (218.316 + 13.176396 * n) % 360.0;
+  const M = (134.963 + 13.064993 * n) % 360.0;
+  const F = (93.272 + 13.229350 * n) % 360.0;
+  
+  const l = L + 6.289 * Math.sin(M * Math.PI / 180.0);
+  const b = 5.128 * Math.sin(F * Math.PI / 180.0);
+  
+  const epsilon = 23.439 - 0.0000004 * n;
+  
+  const l_rad = l * Math.PI / 180.0;
+  const b_rad = b * Math.PI / 180.0;
+  const e_rad = epsilon * Math.PI / 180.0;
+  
+  const ra_y = Math.sin(l_rad) * Math.cos(e_rad) - Math.tan(b_rad) * Math.sin(e_rad);
+  const ra_x = Math.cos(l_rad);
+  
+  let alpha = Math.atan2(ra_y, ra_x) * 180.0 / Math.PI;
+  alpha = alpha % 360.0;
+  if (alpha < 0) alpha += 360.0;
+  
+  const decl = Math.asin(Math.sin(b_rad) * Math.cos(e_rad) + Math.cos(b_rad) * Math.sin(e_rad) * Math.sin(l_rad));
+  
+  let GMST = (280.46061837 + 360.98564736629 * n) % 360.0;
+  if (GMST < 0) GMST += 360.0;
+  let LST = (GMST + lon) % 360.0;
+  if (LST < 0) LST += 360.0;
+  
+  let H = (LST - alpha) % 360.0;
+  if (H > 180.0) H -= 360.0;
+  else if (H < -180.0) H += 360.0;
+  
+  const lat_rad = lat * Math.PI / 180.0;
+  const H_rad = H * Math.PI / 180.0;
+  
+  const el_rad = Math.asin(Math.sin(lat_rad) * Math.sin(decl) + Math.cos(lat_rad) * Math.cos(decl) * Math.cos(H_rad));
+  const elevation = el_rad * 180.0 / Math.PI;
+  
+  const az_rad = Math.atan2(Math.sin(H_rad), Math.cos(H_rad) * Math.sin(lat_rad) - Math.tan(decl) * Math.cos(lat_rad));
+  let azimuth = (az_rad * 180.0 / Math.PI) + 180.0;
+  if (azimuth >= 360.0) azimuth -= 360.0;
+  if (azimuth < 0) azimuth += 360.0;
+  
+  return { azimuth, elevation };
+}
+
 // ── Sunrise / Sunset ───────────────────────────────────────
 function renderSunriseSunset(iotData) {
   const widget = $('sun-widget');
   if (!widget) return;
   const sun = iotData?.sunriseSunset || MockData.getSunriseSunset(24.17);
+  
+  // Temporary: calculate solar position dynamically in frontend based on IoT data timestamp (or now)
+  const dt = iotData?.lastUpdate ? new Date(iotData.lastUpdate) : new Date();
+  const lat = iotData?.location?.lat || 22.738318;
+  const lon = iotData?.location?.lng || 88.479709;
+  const pos = calculateSolarPosition(dt, lat, lon);
+  const moonPos = calculateMoonPosition(dt, lat, lon);
+
+  // Calculate arc position
+  const parseTime = (str) => {
+    const match = str.match(/(\d+):(\d+)(?:\s*(am|pm))?/i);
+    if (!match) return 0;
+    let h = parseInt(match[1], 10);
+    const m = parseInt(match[2], 10);
+    const ampm = match[3] ? match[3].toLowerCase() : null;
+    if (ampm === 'pm' && h < 12) h += 12;
+    if (ampm === 'am' && h === 12) h = 0;
+    return h * 60 + m;
+  };
+  
+  const riseMins = parseTime(sun.sunrise);
+  const setMins = parseTime(sun.sunset);
+  const nowMins = dt.getHours() * 60 + dt.getMinutes();
+  
+  let progress = 0;
+  if (nowMins > setMins) progress = 1;
+  else if (nowMins < riseMins) progress = 0;
+  else progress = (nowMins - riseMins) / (setMins - riseMins);
+  
+  // Calculate SVG coordinates for the sun and path
+  const theta = Math.PI - (progress * Math.PI); // 180deg to 0deg
+  const cx = 100 + 90 * Math.cos(theta);
+  const cy = 90 - 90 * Math.sin(theta);
+  
+  // If progress is 0, drawing an arc with 0 length causes issues in some browsers, so handle it
+  const arcPath = progress > 0 
+    ? `<path d="M 10 90 A 90 90 0 0 1 ${cx.toFixed(2)} ${cy.toFixed(2)}" fill="none" stroke="var(--accent)" stroke-width="3" />` 
+    : '';
+    
+  const sunCircle = pos.elevation >= -5 // Draw sun even if slightly below horizon for visual effect
+    ? `<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="6" fill="var(--accent)" stroke="white" stroke-width="2" />`
+    : '';
 
   widget.innerHTML = `
-    <div class="sun-times">
-      <div class="sun-time-item">
-        <div class="sun-icon">🌅</div>
-        <div class="sun-label">Sunrise</div>
-        <div class="sun-value">${sun.sunrise}</div>
+    <div class="rw-header">
+      <div>
+        <h3 style="font-size:1.1rem">Sun & Moon</h3>
+        <span style="font-size:0.75rem;color:var(--text-3)">Local Sensor Unit</span>
       </div>
-      <div class="sun-time-item">
-        <div class="sun-icon">🌇</div>
-        <div class="sun-label">Sunset</div>
-        <div class="sun-value">${sun.sunset}</div>
+      <div class="rw-temp" style="font-size:1.5rem;font-weight:700;color:var(--accent)">
+        ${iotData?.current?.temperature || '--'}°C
       </div>
     </div>
-    <div class="sun-progress-wrap">
-      <div class="sun-arc-track">
-        <div class="sun-arc-fill" style="width:${sun.progressPct}%"></div>
-      </div>
-      <div class="sun-meta">
-        <div class="sun-meta-item">Day length: <strong>${sun.dayLength}</strong></div>
-        <div class="sun-meta-item">Peak UV: <strong>${sun.uvPeak}</strong></div>
+    <div class="sun-arc-container" style="padding:20px 0;">
+      <svg viewBox="0 0 200 100" width="100%">
+        <path d="M 10 90 A 90 90 0 0 1 190 90" fill="none" stroke="#E2E8F0" stroke-width="2" stroke-dasharray="4 4" />
+        ${arcPath}
+        ${sunCircle}
+        <line x1="0" y1="90" x2="200" y2="90" stroke="#E2E8F0" stroke-width="2" />
+      </svg>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.75rem;font-weight:600;">
+        <div style="text-align:left;">Sunrise<br><span style="color:var(--text-3);font-weight:400">${sun.sunrise}</span></div>
+        <div style="text-align:center;color:var(--text-2);font-weight:400;line-height:1.4;">
+          <span style="color:var(--accent)">Sun:</span> Az ${pos.azimuth.toFixed(1)}° El ${pos.elevation.toFixed(1)}°<br>
+          <span style="color:#94A3B8">Moon:</span> Az ${moonPos.azimuth.toFixed(1)}° El ${moonPos.elevation.toFixed(1)}°
+        </div>
+        <div style="text-align:right;">Sunset<br><span style="color:var(--text-3);font-weight:400">${sun.sunset}</span></div>
       </div>
     </div>`;
 }
@@ -399,7 +525,7 @@ function renderAIPredictionCard(data) {
   show($('ai-content'));
 
   setText('ai-confidence', `${data.confidence}% confidence`);
-  setText('ai-summary',    data.summary);
+  setText('ai-summary', data.summary);
 
   const timeline = $('ai-timeline');
   if (!timeline) return;
@@ -425,18 +551,77 @@ function renderAIError() {
   show($('ai-error'));
 }
 
+let currentChartMetric = 'temperature';
+
+window.setChartMetric = function (metric) {
+  currentChartMetric = metric;
+
+  // Update button styles
+  const buttons = document.querySelectorAll('.chart-filters .icon-btn');
+  buttons.forEach(btn => {
+    btn.classList.remove('active');
+    btn.style.background = 'var(--surface-2)';
+    btn.style.color = '';
+  });
+
+  const activeBtn = document.querySelector(`.chart-filters .icon-btn[data-metric="${metric}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    activeBtn.style.background = 'var(--accent)';
+    activeBtn.style.color = 'white';
+  }
+
+  // Re-render chart if data is available
+  if (state.aiPrediction) {
+    renderMainTempChart(state.aiPrediction);
+  }
+};
+
+function renderMainTempChart(data) {
+  const container = $('main-temp-chart-container');
+  if (!container || !data || !data.hourly) return;
+
+  const hourly = data.hourly.slice(0, 24);
+  let values, color, unit;
+
+  if (currentChartMetric === 'temperature') {
+    values = hourly.map(h => h.temperature);
+    color = '#FF8A00'; // accent orange
+    unit = '°C';
+  } else if (currentChartMetric === 'rain') {
+    values = hourly.map(h => h.rainProbability || 0);
+    color = '#3B82F6'; // blue
+    unit = '%';
+  } else if (currentChartMetric === 'wind') {
+    values = hourly.map(h => h.windSpeed || 0);
+    color = '#10B981'; // green
+    unit = 'km/h';
+  }
+
+  const labels = hourly.map(h => h.time);
+
+  container.innerHTML = Charts.areaChart(values, labels, {
+    w: container.clientWidth || 420,
+    h: 120,
+    color: color,
+    fillFrom: color,
+    unit: unit,
+    showDots: false
+  });
+}
+
 // ── Sensor grid (dashboard) ────────────────────────────────
 function getSensorValue(data, key) {
   const c = data.current;
   switch (key) {
     case 'temperature': return { val: c.temperature, display: `${c.temperature}°C`, trend: getTrend(data.history, 'temperature') };
-    case 'humidity':    return { val: c.humidity,    display: `${c.humidity}%`,      trend: getTrend(data.history, 'humidity') };
-    case 'windSpeed':   return { val: c.windSpeed,   display: `${c.windSpeed}`,      trend: null };
-    case 'rain':        return { val: c.rainfallMm,  display: c.rain ? `${c.rainfallMm} mm` : 'No Rain', trend: null };
-    case 'aqi':         return { val: c.aqi,         display: `${c.aqi}`,            trend: getTrend(data.history, 'aqi') };
-    case 'uvIndex':     return { val: c.uvIndex,     display: `${c.uvIndex}`,        trend: null };
-    case 'pressure':    return { val: c.pressure,    display: `${c.pressure}`,       trend: c.pressureTrend };
-    case 'visibility':  return { val: c.visibility,  display: `${c.visibility}`,     trend: null };
+    case 'humidity': return { val: c.humidity, display: `${c.humidity}%`, trend: getTrend(data.history, 'humidity') };
+    case 'windSpeed': return { val: c.windSpeed, display: `${c.windSpeed}`, trend: null };
+    case 'rain': return { val: c.rainfallMm, display: c.rain ? `${c.rainfallMm} mm` : 'No Rain', trend: null };
+    case 'aqi': return { val: c.aqi, display: `${c.aqi}`, trend: getTrend(data.history, 'aqi') };
+    case 'uvIndex': return { val: c.uvIndex, display: `${c.uvIndex}`, trend: null };
+    case 'pressure': return { val: c.pressure, display: `${c.pressure}`, trend: c.pressureTrend };
+    case 'visibility': return { val: c.visibility, display: `${c.visibility}`, trend: null };
     default: return { val: 0, display: '—', trend: null };
   }
 }
@@ -446,35 +631,35 @@ function getTrend(history, key) {
   const recent = history.slice(-6).map(h => h[key]).filter(v => v != null);
   if (recent.length < 2) return null;
   const diff = recent[recent.length - 1] - recent[0];
-  if (diff > 0.5)  return { dir:'up',   label:`↑ ${Math.abs(diff).toFixed(1)}` };
-  if (diff < -0.5) return { dir:'down', label:`↓ ${Math.abs(diff).toFixed(1)}` };
-  return { dir:'stable', label:'→ Stable' };
+  if (diff > 0.5) return { dir: 'up', label: `↑ ${Math.abs(diff).toFixed(1)}` };
+  if (diff < -0.5) return { dir: 'down', label: `↓ ${Math.abs(diff).toFixed(1)}` };
+  return { dir: 'stable', label: '→ Stable' };
 }
 
 function getSensorStatus(key, val) {
   switch (key) {
     case 'aqi':
-      if (val <= 50)  return { cls:'good',      label:'Good' };
-      if (val <= 100) return { cls:'moderate',  label:'Moderate' };
-      if (val <= 150) return { cls:'high',      label:'Unhealthy' };
-      return                 { cls:'dangerous', label:'Hazardous' };
+      if (val <= 50) return { cls: 'good', label: 'Good' };
+      if (val <= 100) return { cls: 'moderate', label: 'Moderate' };
+      if (val <= 150) return { cls: 'high', label: 'Unhealthy' };
+      return { cls: 'dangerous', label: 'Hazardous' };
     case 'uvIndex':
-      if (val <= 2)  return { cls:'good',     label:'Low' };
-      if (val <= 5)  return { cls:'moderate', label:'Moderate' };
-      if (val <= 7)  return { cls:'high',     label:'High' };
-      return               { cls:'dangerous', label:'Very High' };
+      if (val <= 2) return { cls: 'good', label: 'Low' };
+      if (val <= 5) return { cls: 'moderate', label: 'Moderate' };
+      if (val <= 7) return { cls: 'high', label: 'High' };
+      return { cls: 'dangerous', label: 'Very High' };
     case 'humidity':
-      if (val < 40)  return { cls:'moderate', label:'Dry' };
-      if (val <= 70) return { cls:'good',     label:'Comfortable' };
-      return               { cls:'moderate',  label:'Humid' };
+      if (val < 40) return { cls: 'moderate', label: 'Dry' };
+      if (val <= 70) return { cls: 'good', label: 'Comfortable' };
+      return { cls: 'moderate', label: 'Humid' };
     case 'windSpeed':
-      if (val < 20)  return { cls:'good',     label:'Calm' };
-      if (val < 40)  return { cls:'moderate', label:'Moderate' };
-      return               { cls:'high',      label:'Strong' };
+      if (val < 20) return { cls: 'good', label: 'Calm' };
+      if (val < 40) return { cls: 'moderate', label: 'Moderate' };
+      return { cls: 'high', label: 'Strong' };
     case 'rain':
-      return val === 0 ? { cls:'good', label:'No Rain' } : { cls:'moderate', label:'Raining' };
+      return val === 0 ? { cls: 'good', label: 'No Rain' } : { cls: 'moderate', label: 'Raining' };
     default:
-      return { cls:'good', label:'Normal' };
+      return { cls: 'good', label: 'Normal' };
   }
 }
 
@@ -487,18 +672,22 @@ function renderSensorGrid(data) {
   const grid = $('sensor-grid');
   if (!grid) return;
 
+  const isInitialRender = grid.childElementCount === 0;
+
   grid.innerHTML = SENSORS.map((sensor, idx) => {
     const { val, display, trend } = getSensorValue(data, sensor.key);
-    const status   = getSensorStatus(sensor.key, val);
-    const sparkData= getSparklineData(data.history, sensor.key === 'windSpeed' ? 'windSpeed' : sensor.key);
-    const spark    = sparkData.length > 2 ? Charts.sparkline(sparkData, { w:80, h:30, color:sensor.sparkColor }) : '';
+    const status = getSensorStatus(sensor.key, val);
+    const sparkData = getSparklineData(data.history, sensor.key === 'windSpeed' ? 'windSpeed' : sensor.key);
+    const spark = sparkData.length > 2 ? Charts.sparkline(sparkData, { w: 80, h: 30, color: sensor.sparkColor }) : '';
 
     const trendHtml = trend
       ? `<div class="sc-trend ${trend.dir}">${trend.label}</div>`
       : '';
 
+    const animClass = isInitialRender ? `anim-fade-up anim-delay-${Math.min(idx + 1, 6)}` : '';
+
     return `
-      <div class="sensor-card anim-fade-up anim-delay-${Math.min(idx+1, 6)}"
+      <div class="sensor-card ${animClass}"
            role="listitem"
            tabindex="0"
            data-sensor="${sensor.key}"
@@ -511,8 +700,8 @@ function renderSensorGrid(data) {
         <div class="sc-label">${sensor.label}</div>
         <div class="sc-value" aria-live="polite">
           ${display.includes('°') || display.includes('%') || display.includes('km') || display.includes('hPa')
-            ? display
-            : `${display}<span class="sc-unit">${sensor.unit}</span>`}
+        ? display
+        : `${display}<span class="sc-unit">${sensor.unit}</span>`}
         </div>
         ${trendHtml}
         <div class="sc-sparkline" aria-hidden="true">${spark}</div>
@@ -520,7 +709,7 @@ function renderSensorGrid(data) {
   }).join('');
 
   grid.querySelectorAll('.sensor-card').forEach(card => {
-    card.addEventListener('click',   () => openSensorModal(card.dataset.sensor));
+    card.addEventListener('click', () => openSensorModal(card.dataset.sensor));
     card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') openSensorModal(card.dataset.sensor); });
   });
 }
@@ -575,8 +764,8 @@ function renderRecommendations(iotData) {
   const doDontWrap = $('do-dont-wrap');
   if (!list) return;
 
-  const recs   = iotData.recommendations || [];
-  const doDont = iotData.doDont           || { dos:[], donts:[] };
+  const recs = iotData.recommendations || [];
+  const doDont = iotData.doDont || { dos: [], donts: [] };
 
   list.innerHTML = recs.slice(0, 4).map(r => `
     <div class="reco-item type-${r.type}" role="listitem">
@@ -636,40 +825,40 @@ function renderSafetyAlerts(iotData) {
 
 // ── Sensor detail modal (enhanced) ────────────────────────
 function openSensorModal(sensorKey) {
-  const sensor   = SENSORS.find(s => s.key === sensorKey);
+  const sensor = SENSORS.find(s => s.key === sensorKey);
   if (!sensor || !state.iotData) return;
 
-  const data     = state.iotData;
+  const data = state.iotData;
   const { val, display } = getSensorValue(data, sensorKey);
-  const history  = data.history;
-  const c        = data.current;
+  const history = data.history;
+  const c = data.current;
 
   const histVals = getSparklineData(history, sensorKey).filter(v => v != null);
-  const allHist  = history.map(h => h[sensorKey]).filter(v => v != null);
-  const minVal   = allHist.length ? Math.min(...allHist).toFixed(1) : '—';
-  const maxVal   = allHist.length ? Math.max(...allHist).toFixed(1) : '—';
-  const avgVal   = allHist.length ? (allHist.reduce((a,b) => a+b,0)/allHist.length).toFixed(1) : '—';
+  const allHist = history.map(h => h[sensorKey]).filter(v => v != null);
+  const minVal = allHist.length ? Math.min(...allHist).toFixed(1) : '—';
+  const maxVal = allHist.length ? Math.max(...allHist).toFixed(1) : '—';
+  const avgVal = allHist.length ? (allHist.reduce((a, b) => a + b, 0) / allHist.length).toFixed(1) : '—';
   const lastUpdate = data.lastUpdate ? timeAgo(data.lastUpdate) : '—';
 
   const histLabels = history.slice(-16).map(h => formatTime(h.timestamp));
 
   const chart = histVals.length > 2
-    ? Charts.areaChart(histVals, histLabels, { color: sensor.sparkColor, fillFrom: sensor.sparkColor, unit: ` ${sensor.unit}`, w:480, h:140 })
+    ? Charts.areaChart(histVals, histLabels, { color: sensor.sparkColor, fillFrom: sensor.sparkColor, unit: ` ${sensor.unit}`, w: 480, h: 140 })
     : '<p class="chart-empty" style="color:var(--text-3);padding:16px;text-align:center">Not enough data for chart</p>';
 
   let extraHtml = '';
   if (sensorKey === 'pressure') {
     extraHtml = `<div style="display:flex;justify-content:center;margin-top:8px">
-      ${Charts.pressureGauge(val, { w:140, h:80 })}</div>`;
+      ${Charts.pressureGauge(val, { w: 140, h: 80 })}</div>`;
   }
   if (sensorKey === 'uvIndex') {
     extraHtml = `<div style="display:flex;justify-content:center;align-items:center;gap:10px;margin-top:8px">
-      ${Charts.uvArc(val, { w:100, h:56 })}
+      ${Charts.uvArc(val, { w: 100, h: 56 })}
       <span style="font-size:0.8125rem;color:var(--text-2)">${uvCategory(val).label}</span></div>`;
   }
   if (sensorKey === 'windSpeed') {
     extraHtml = `<div style="display:flex;justify-content:center;gap:16px;align-items:center;margin-top:8px">
-      ${Charts.windCompass(c.windDirectionDeg || 45, { size:60 })}
+      ${Charts.windCompass(c.windDirectionDeg || 45, { size: 60 })}
       <div style="font-size:0.8125rem;color:var(--text-2)">Direction: <strong>${c.windDirection || 'NE'}</strong></div>
     </div>`;
   }
@@ -746,15 +935,18 @@ async function renderSensorsPage() {
   await renderAnomalyDetection(data);
 
   // Detailed sensor grid
+  const isInitialRender = grid.querySelectorAll('.sensor-card').length === 0;
+
   grid.innerHTML = SENSORS.map((sensor, idx) => {
     const { val, display, trend } = getSensorValue(data, sensor.key);
-    const status   = getSensorStatus(sensor.key, val);
-    const sparkData= getSparklineData(data.history, sensor.key);
-    const spark    = sparkData.length > 2 ? Charts.sparkline(sparkData, { w:120, h:36, color:sensor.sparkColor }) : '';
-    const trendHtml= trend ? `<div class="sc-trend ${trend.dir}">${trend.label}</div>` : '';
+    const status = getSensorStatus(sensor.key, val);
+    const sparkData = getSparklineData(data.history, sensor.key);
+    const spark = sparkData.length > 2 ? Charts.sparkline(sparkData, { w: 120, h: 36, color: sensor.sparkColor }) : '';
+    const trendHtml = trend ? `<div class="sc-trend ${trend.dir}">${trend.label}</div>` : '';
+    const animClass = isInitialRender ? `anim-fade-up anim-delay-${Math.min(idx + 1, 6)}` : '';
 
     return `
-      <div class="sensor-card detailed anim-fade-up anim-delay-${Math.min(idx+1,6)}"
+      <div class="sensor-card detailed ${animClass}"
            role="listitem" tabindex="0" data-sensor="${sensor.key}"
            aria-label="${sensor.label}: ${display}">
         <div class="sc-top">
@@ -780,7 +972,7 @@ async function renderSensorsPage() {
 // ── IoT Device Health ──────────────────────────────────────
 async function renderDeviceHealth(iotData) {
   const content = $('device-health-content');
-  const badge   = $('device-status-badge');
+  const badge = $('device-status-badge');
   if (!content) return;
 
   try {
@@ -816,10 +1008,10 @@ async function renderDeviceHealth(iotData) {
       </div>
       <div class="sensor-health-grid">
         ${health.sensors.map(s => {
-          const minsSince = Math.round((Date.now() - new Date(s.lastSeen).getTime()) / 60000);
-          const statusCls = !s.online ? 'offline' : minsSince > 5 ? 'stale' : 'online';
-          const statusLabel = !s.online ? 'Offline' : minsSince > 5 ? 'Stale' : 'Live';
-          return `
+      const minsSince = Math.round((Date.now() - new Date(s.lastSeen).getTime()) / 60000);
+      const statusCls = !s.online ? 'offline' : minsSince > 5 ? 'stale' : 'online';
+      const statusLabel = !s.online ? 'Offline' : minsSince > 5 ? 'Stale' : 'Live';
+      return `
           <div class="sensor-health-item">
             <div class="shi-icon">${s.icon}</div>
             <div class="shi-info">
@@ -828,7 +1020,7 @@ async function renderDeviceHealth(iotData) {
             </div>
             <div class="shi-dot ${statusCls}"></div>
           </div>`;
-        }).join('')}
+    }).join('')}
       </div>`;
   } catch {
     content.innerHTML = '<p style="color:var(--text-3);padding:16px">Device health data unavailable.</p>';
@@ -894,9 +1086,9 @@ function renderAIPage() {
 
   const data = state.aiPrediction;
   const histTemps = data.hourly.map(h => h.temperature);
-  const histLabels= data.hourly.slice(0, 16).map(h => h.time);
+  const histLabels = data.hourly.slice(0, 16).map(h => h.time);
   const chart = Charts.areaChart(histTemps.slice(0, 16), histLabels, {
-    color:'#8B5CF6', fillFrom:'#8B5CF6', unit:'°C', w:680, h:160
+    color: '#8B5CF6', fillFrom: '#8B5CF6', unit: '°C', w: 680, h: 160
   });
 
   container.innerHTML = `
@@ -970,9 +1162,9 @@ async function renderAILabPage() {
 }
 
 async function loadAndRenderModelPerformance() {
-  const grid    = $('model-info-grid');
+  const grid = $('model-info-grid');
   const metrics = $('model-metrics-content');
-  const badge   = $('model-status-badge');
+  const badge = $('model-status-badge');
   if (!grid) return;
 
   try {
@@ -986,12 +1178,12 @@ async function loadAndRenderModelPerformance() {
     }
 
     grid.innerHTML = [
-      { label: 'Model Name',     value: m.name },
-      { label: 'Type',           value: m.type },
-      { label: 'Trained',        value: m.trainingDate },
-      { label: 'Training Data',  value: m.trainingRecords.toLocaleString() + ' records' },
-      { label: 'Features',       value: m.features + ' inputs' },
-      { label: 'Version',        value: m.version },
+      { label: 'Model Name', value: m.name },
+      { label: 'Type', value: m.type },
+      { label: 'Trained', value: m.trainingDate },
+      { label: 'Training Data', value: m.trainingRecords.toLocaleString() + ' records' },
+      { label: 'Features', value: m.features + ' inputs' },
+      { label: 'Version', value: m.version },
     ].map(s => `
       <div class="model-info-stat">
         <div class="mis-label">${s.label}</div>
@@ -1034,14 +1226,14 @@ async function loadAndRenderModelPerformance() {
 }
 
 async function loadAndRenderAIVsActual() {
-  const summary   = $('ai-vs-actual-summary');
+  const summary = $('ai-vs-actual-summary');
   const chartWrap = $('ai-vs-actual-chart');
   const tableWrap = $('ai-vs-actual-table-wrap');
   if (!summary) return;
 
   try {
     const iotData = state.iotData;
-    const aiPred  = state.aiPrediction;
+    const aiPred = state.aiPrediction;
     if (!iotData || !aiPred) {
       if (summary) summary.innerHTML = '<p class="metric-na">Load IoT data first.</p>';
       return;
@@ -1066,14 +1258,14 @@ async function loadAndRenderAIVsActual() {
     // Multi-line chart
     if (chartWrap) {
       const predicted = result.validations.map(v => v.predicted.temperature);
-      const actual    = result.validations.map(v => v.actual.temperature);
-      const labels    = result.validations.map(v => v.time);
+      const actual = result.validations.map(v => v.actual.temperature);
+      const labels = result.validations.map(v => v.time);
       chartWrap.innerHTML = `
         <div style="padding:12px;background:var(--surface-2);border-radius:var(--radius-md)">
           ${Charts.multiLineChart([
-            { label: 'AI Predicted', values: predicted, color: '#8B5CF6', dashed: true },
-            { label: 'Actual (IoT)', values: actual,    color: '#10B981', dashed: false },
-          ], labels, { unit: '°C' })}
+        { label: 'AI Predicted', values: predicted, color: '#8B5CF6', dashed: true },
+        { label: 'Actual (IoT)', values: actual, color: '#10B981', dashed: false },
+      ], labels, { unit: '°C' })}
           <div style="display:flex;gap:16px;margin-top:8px;font-size:0.75rem">
             <span style="color:#8B5CF6">— — AI Predicted</span>
             <span style="color:#10B981">—— Actual (IoT)</span>
@@ -1097,9 +1289,9 @@ async function loadAndRenderAIVsActual() {
           </thead>
           <tbody>
             ${result.validations.map(v => {
-              const tempCls = v.accuracies.temperature >= 90 ? 'good' : v.accuracies.temperature >= 75 ? 'ok' : 'bad';
-              const humCls  = v.accuracies.humidity >= 90 ? 'good' : v.accuracies.humidity >= 75 ? 'ok' : 'bad';
-              return `
+        const tempCls = v.accuracies.temperature >= 90 ? 'good' : v.accuracies.temperature >= 75 ? 'ok' : 'bad';
+        const humCls = v.accuracies.humidity >= 90 ? 'good' : v.accuracies.humidity >= 75 ? 'ok' : 'bad';
+        return `
               <tr>
                 <td>${v.time}</td>
                 <td>${v.predicted.temperature}°C</td>
@@ -1108,7 +1300,7 @@ async function loadAndRenderAIVsActual() {
                 <td><span class="acc-chip ${tempCls}">${v.accuracies.temperature}%</span></td>
                 <td><span class="acc-chip ${humCls}">${v.accuracies.humidity}%</span></td>
               </tr>`;
-            }).join('')}
+      }).join('')}
           </tbody>
         </table>`;
     }
@@ -1123,7 +1315,7 @@ async function loadAndRenderXAI() {
 
   try {
     const iotData = state.iotData;
-    const aiPred  = state.aiPrediction;
+    const aiPred = state.aiPrediction;
     if (!iotData || !aiPred) {
       content.innerHTML = '<p class="metric-na">Load data first.</p>';
       return;
@@ -1321,9 +1513,9 @@ function renderIntelligencePage() {
   }
 
   const iotData = state.iotData;
-  const recs    = iotData.recommendations || [];
-  const doDont  = iotData.doDont || { dos:[], donts:[] };
-  const alerts  = iotData.safetyAlerts || [];
+  const recs = iotData.recommendations || [];
+  const doDont = iotData.doDont || { dos: [], donts: [] };
+  const alerts = iotData.safetyAlerts || [];
 
   container.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
@@ -1358,8 +1550,8 @@ function renderIntelligencePage() {
       <div class="section-header"><h3>Safety Status</h3></div>
       <div class="safety-alerts">
         ${alerts.length === 0
-          ? `<div class="safety-ok"><span class="ok-icon">✅</span><span>No active warnings. All conditions are within safe ranges.</span></div>`
-          : alerts.map(a => `
+      ? `<div class="safety-ok"><span class="ok-icon">✅</span><span>No active warnings. All conditions are within safe ranges.</span></div>`
+      : alerts.map(a => `
             <div class="safety-alert level-${a.level}">
               <div class="alert-icon">${a.icon}</div>
               <div class="alert-body">
@@ -1380,9 +1572,9 @@ async function renderAnalyticsPage() {
 
 async function loadHistoricalData(range) {
   const chartWrap = $('analytics-chart-wrap');
-  const statsRow  = $('analytics-stats-row');
-  const title     = $('analytics-chart-title');
-  const sensor    = state.analyticsSensor;
+  const statsRow = $('analytics-stats-row');
+  const title = $('analytics-chart-title');
+  const sensor = state.analyticsSensor;
 
   if (chartWrap) chartWrap.innerHTML = '<div class="skeleton skel-block" style="height:160px"></div>';
 
@@ -1397,7 +1589,7 @@ async function loadHistoricalData(range) {
 
     if (title) {
       const sensorName = sensorDef.label;
-      const rangeLabel = { '1h':'Last 1h','6h':'Last 6h','12h':'Last 12h','24h':'Last 24h','7d':'Last 7 days','30d':'Last 30 days' }[range] || range;
+      const rangeLabel = { '1h': 'Last 1h', '6h': 'Last 6h', '12h': 'Last 12h', '24h': 'Last 24h', '7d': 'Last 7 days', '30d': 'Last 30 days' }[range] || range;
       title.textContent = `${sensorName} — ${rangeLabel}`;
     }
 
@@ -1405,11 +1597,11 @@ async function loadHistoricalData(range) {
       chartWrap.innerHTML = `
         <div style="padding:12px;background:var(--surface-2);border-radius:var(--radius-md);overflow:hidden">
           ${Charts.areaChart(values, labels, {
-            color: sensorDef.sparkColor,
-            fillFrom: sensorDef.sparkColor,
-            unit: ` ${sensorDef.unit}`,
-            w: 720, h: 160
-          })}
+        color: sensorDef.sparkColor,
+        fillFrom: sensorDef.sparkColor,
+        unit: ` ${sensorDef.unit}`,
+        w: 720, h: 160
+      })}
         </div>`;
     } else if (chartWrap) {
       chartWrap.innerHTML = '<p style="color:var(--text-3);padding:24px;text-align:center">Not enough data points for this range.</p>';
@@ -1419,7 +1611,7 @@ async function loadHistoricalData(range) {
     if (statsRow && values.length) {
       const min = Math.min(...values).toFixed(1);
       const max = Math.max(...values).toFixed(1);
-      const avg = (values.reduce((a,b) => a+b,0) / values.length).toFixed(1);
+      const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1);
       statsRow.innerHTML = `
         <div class="astat"><div class="astat-label">Min</div><div class="astat-value">${min}<span class="astat-unit">${sensorDef.unit}</span></div></div>
         <div class="astat"><div class="astat-label">Max</div><div class="astat-value">${max}<span class="astat-unit">${sensorDef.unit}</span></div></div>
@@ -1440,14 +1632,14 @@ async function renderSystemAnalytics() {
     state.systemAnalytics = analytics;
 
     const items = [
-      { icon:'📡', value: analytics.totalReadings.toLocaleString(), label:'Total Readings' },
-      { icon:'🤖', value: analytics.totalPredictions.toLocaleString(), label:'Total Predictions' },
-      { icon:'🎯', value: analytics.averageAccuracy + '%', label:'Avg Accuracy' },
-      { icon:'⚡', value: analytics.totalAnomalies, label:'Anomalies Detected' },
-      { icon:'🔔', value: analytics.totalAlerts, label:'Alerts Generated' },
-      { icon:'📶', value: analytics.iotUptime + '%', label:'IoT Uptime' },
-      { icon:'🗃️', value: analytics.dataAvailability + '%', label:'Data Availability' },
-      { icon:'⏱', value: analytics.avgResponseTime, label:'Avg Response Time' },
+      { icon: '📡', value: analytics.totalReadings.toLocaleString(), label: 'Total Readings' },
+      { icon: '🤖', value: analytics.totalPredictions.toLocaleString(), label: 'Total Predictions' },
+      { icon: '🎯', value: analytics.averageAccuracy + '%', label: 'Avg Accuracy' },
+      { icon: '⚡', value: analytics.totalAnomalies, label: 'Anomalies Detected' },
+      { icon: '🔔', value: analytics.totalAlerts, label: 'Alerts Generated' },
+      { icon: '📶', value: analytics.iotUptime + '%', label: 'IoT Uptime' },
+      { icon: '🗃️', value: analytics.dataAvailability + '%', label: 'Data Availability' },
+      { icon: '⏱', value: analytics.avgResponseTime, label: 'Avg Response Time' },
     ];
 
     grid.innerHTML = items.map(it => `
@@ -1469,9 +1661,9 @@ function renderMapPage() {
   const c = state.iotData.current;
   stationReadings.innerHTML = [
     { label: 'Temperature', value: `${c.temperature}°C` },
-    { label: 'Humidity',    value: `${c.humidity}%` },
-    { label: 'AQI',         value: `${c.aqi}` },
-    { label: 'Wind',        value: `${c.windSpeed} km/h` },
+    { label: 'Humidity', value: `${c.humidity}%` },
+    { label: 'AQI', value: `${c.aqi}` },
+    { label: 'Wind', value: `${c.windSpeed} km/h` },
   ].map(r => `
     <div class="sic-reading">
       <div class="sic-reading-label">${r.label}</div>
@@ -1545,7 +1737,7 @@ async function loadExternalWeather(loc) {
 }
 
 function renderExternalWeatherCard(data, container) {
-  const c   = data.current;
+  const c = data.current;
   const loc = data.location;
   const isSaved = state.savedLocations.some(s => s.city === loc.city);
 
@@ -1561,10 +1753,10 @@ function renderExternalWeatherCard(data, container) {
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           ${!isSaved
-            ? `<button class="btn-add-location" id="save-ext-loc" data-loc='${JSON.stringify(loc)}'>
+      ? `<button class="btn-add-location" id="save-ext-loc" data-loc='${JSON.stringify(loc)}'>
                 <i data-lucide="bookmark-plus"></i> Save Location
                </button>`
-            : `<span class="badge badge-success">✓ Saved</span>`}
+      : `<span class="badge badge-success">✓ Saved</span>`}
         </div>
       </div>
       <div class="ext-temp-row">
@@ -1647,13 +1839,13 @@ function persistSavedLocations() {
 function saveLocation(loc, temp, condition) {
   if (state.savedLocations.find(s => s.city === loc.city)) return;
   state.savedLocations.push({
-    id:        Date.now(),
-    city:      loc.city,
-    state:     loc.state,
-    country:   loc.country,
-    lat:       loc.lat,
-    lng:       loc.lng,
-    temp:      Math.round(temp),
+    id: Date.now(),
+    city: loc.city,
+    state: loc.state,
+    country: loc.country,
+    lat: loc.lat,
+    lng: loc.lng,
+    temp: Math.round(temp),
     condition: condition,
   });
   persistSavedLocations();
@@ -1902,11 +2094,11 @@ function renderSettings() {
           <div style="font-size:0.875rem;font-weight:600;margin-bottom:8px;color:var(--text-2)">Scenario</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px">
             ${[
-              { key: 'rain_event', label: '🌧️ Rain Event' },
-              { key: 'aqi_spike',  label: '🫁 AQI Spike'  },
-              { key: 'temp_spike', label: '🌡️ Heat Wave'  },
-              { key: 'clear_night', label: '🌙 Clear Night' },
-            ].map(s => `
+      { key: 'rain_event', label: '🌧️ Rain Event' },
+      { key: 'aqi_spike', label: '🫁 AQI Spike' },
+      { key: 'temp_spike', label: '🌡️ Heat Wave' },
+      { key: 'clear_night', label: '🌙 Clear Night' },
+    ].map(s => `
               <button class="trn-btn demo-scenario-btn ${state.demoScenario === s.key ? 'active' : ''}"
                       data-scenario="${s.key}">${s.label}</button>
             `).join('')}
@@ -2031,7 +2223,7 @@ function setupNotifications() {
   // Listen for updates
   NotificationsManager.onUpdate((notifications, unread) => {
     const badge = $('notif-unread-badge');
-    const dot   = $('notif-dot');
+    const dot = $('notif-dot');
     if (badge) {
       badge.textContent = unread > 9 ? '9+' : unread;
       badge.style.display = unread > 0 ? '' : 'none';
@@ -2084,11 +2276,11 @@ function toggleNotifPanel() {
 
 // ── AI Assistant ───────────────────────────────────────────
 function setupAssistant() {
-  const fab   = $('assistant-fab');
+  const fab = $('assistant-fab');
   const panel = $('assistant-panel');
   const close = $('assistant-close');
   const input = $('assistant-input');
-  const send  = $('assistant-send');
+  const send = $('assistant-send');
 
   if (!fab) return;
 
@@ -2199,9 +2391,9 @@ function setupPWA() {
     loadIoTData().then(data => { if (data) loadAIPrediction(); });
   });
 
-  const installBtn  = $('btn-pwa-install');
-  const dismissBtn  = $('btn-pwa-dismiss');
-  const installBar  = $('pwa-install-bar');
+  const installBtn = $('btn-pwa-install');
+  const dismissBtn = $('btn-pwa-dismiss');
+  const installBar = $('pwa-install-bar');
 
   if (installBtn) installBtn.addEventListener('click', () => PWAManager.promptInstall());
   if (dismissBtn) dismissBtn.addEventListener('click', () => {
@@ -2213,9 +2405,9 @@ function setupPWA() {
 function setupExport() {
   if (!window.DataExporter) return;
 
-  const exportCsv  = $('export-csv');
+  const exportCsv = $('export-csv');
   const exportJson = $('export-json');
-  const exportPdf  = $('export-pdf');
+  const exportPdf = $('export-pdf');
 
   if (exportCsv) exportCsv.addEventListener('click', () => {
     DataExporter.historyToCSV(
@@ -2246,16 +2438,16 @@ function renderLoadingGrid(count) {
 
 // ── IoT polling ────────────────────────────────────────────
 function setupPolling() {
-  // Update relative time every 30 seconds
+  // Update relative time every 5 seconds
   setInterval(() => {
     if (state.iotData?.lastUpdate) {
       const el = $('iot-update-time');
       if (el) el.textContent = timeAgo(state.iotData.lastUpdate);
       updateLastUpdatedChip();
     }
-  }, 30_000);
+  }, 5_000);
 
-  // Refresh IoT data every 60 seconds
+  // Refresh IoT data every 5 seconds
   state.iotPollingTimer = setInterval(async () => {
     try {
       const data = await API.getIoTData();
@@ -2271,7 +2463,7 @@ function setupPolling() {
       // Check alert thresholds
       if (window.NotificationsManager) NotificationsManager.checkThresholds(data);
     } catch { /* keep showing last known data */ }
-  }, 60_000);
+  }, 5_000);
 }
 
 // ── Event listeners ────────────────────────────────────────
@@ -2294,9 +2486,9 @@ function setupEventListeners() {
   });
 
   // Sidebar toggle
-  const toggle   = $('sidebar-toggle');
-  const sidebar  = $('sidebar');
-  const overlay  = $('sidebar-overlay');
+  const toggle = $('sidebar-toggle');
+  const sidebar = $('sidebar');
+  const overlay = $('sidebar-overlay');
 
   if (toggle) toggle.addEventListener('click', () => {
     const open = sidebar.classList.toggle('open');
@@ -2484,10 +2676,10 @@ function setupEventListeners() {
 function closeSidebarOnMobile() {
   const sidebar = $('sidebar');
   const overlay = $('sidebar-overlay');
-  const toggle  = $('sidebar-toggle');
-  if (sidebar)  sidebar.classList.remove('open');
-  if (overlay)  overlay.classList.remove('show');
-  if (toggle)   toggle.setAttribute('aria-expanded', 'false');
+  const toggle = $('sidebar-toggle');
+  if (sidebar) sidebar.classList.remove('open');
+  if (overlay) overlay.classList.remove('show');
+  if (toggle) toggle.setAttribute('aria-expanded', 'false');
 }
 
 // ── Data loading ───────────────────────────────────────────
@@ -2517,6 +2709,7 @@ async function loadAIPrediction() {
     renderHourlyForecast(data);
     renderSevenDayForecast(data);
     renderWeatherTimeline(data);
+    renderMainTempChart(data);
     return data;
   } catch {
     renderAIError();
