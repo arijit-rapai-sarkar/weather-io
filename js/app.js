@@ -1,12 +1,12 @@
 'use strict';
 // ============================================================
-// WeatherIQ — Main Application Controller v2.0
+// WeatherIQ â Main Application Controller v2.0
 // Manages: state, routing, rendering, events, polling, theme,
 //          AI Lab, Analytics, Maps, Notifications, AI Assistant,
 //          Weather Score, Device Health, Anomalies, PWA
 // ============================================================
 
-// ── Application state ──────────────────────────────────────
+// ââ Application state ââââââââââââââââââââââââââââââââââââââ
 const state = {
   currentPage: 'dashboard',
   theme: localStorage.getItem('wiq-theme') || 'light',
@@ -42,28 +42,28 @@ const state = {
   lastUpdatedAt: null,
 };
 
-// ── Sensor definitions ─────────────────────────────────────
+// ââ Sensor definitions âââââââââââââââââââââââââââââââââââââ
 const SENSORS = [
-  { key: 'temperature', label: 'Temperature', icon: '🌡️', unit: '°C', color: '#EF4444', sparkColor: '#EF4444' },
-  { key: 'humidity', label: 'Humidity', icon: '💧', unit: '%', color: '#3B82F6', sparkColor: '#3B82F6' },
-  { key: 'windSpeed', label: 'Wind Speed', icon: '💨', unit: 'km/h', color: '#6366F1', sparkColor: '#6366F1' },
-  { key: 'rain', label: 'Rainfall', icon: '🌧️', unit: 'mm', color: '#0EA5E9', sparkColor: '#0EA5E9' },
-  { key: 'aqi', label: 'Air Quality', icon: '🫁', unit: 'AQI', color: '#F59E0B', sparkColor: '#F59E0B' },
-  { key: 'uvIndex', label: 'UV Index', icon: '☀️', unit: 'UV', color: '#F97316', sparkColor: '#F97316' },
-  { key: 'pressure', label: 'Pressure', icon: '🌬️', unit: 'hPa', color: '#8B5CF6', sparkColor: '#8B5CF6' },
-  { key: 'visibility', label: 'Visibility', icon: '👁️', unit: 'km', color: '#10B981', sparkColor: '#10B981' },
+  { key: 'temperature', label: 'Temperature', icon: 'ð¡ï¸', unit: 'Â°C', color: '#EF4444', sparkColor: '#EF4444' },
+  { key: 'humidity', label: 'Humidity', icon: 'ð§', unit: '%', color: '#3B82F6', sparkColor: '#3B82F6' },
+  { key: 'windSpeed', label: 'Wind Speed', icon: 'ð¨', unit: 'km/h', color: '#6366F1', sparkColor: '#6366F1' },
+  { key: 'rain', label: 'Rainfall', icon: 'ð§ï¸', unit: 'mm', color: '#0EA5E9', sparkColor: '#0EA5E9' },
+  { key: 'aqi', label: 'Air Quality', icon: 'ð«', unit: 'AQI', color: '#F59E0B', sparkColor: '#F59E0B' },
+  { key: 'uvIndex', label: 'UV Index', icon: 'âï¸', unit: 'UV', color: '#F97316', sparkColor: '#F97316' },
+  { key: 'pressure', label: 'Pressure', icon: 'ð¬ï¸', unit: 'hPa', color: '#8B5CF6', sparkColor: '#8B5CF6' },
+  { key: 'visibility', label: 'Visibility', icon: 'ðï¸', unit: 'km', color: '#10B981', sparkColor: '#10B981' },
 ];
 
 // Source badge helpers
 const SOURCE_BADGES = {
-  iot: '<span class="badge badge-iot" style="font-size:0.6rem">● LIVE IoT</span>',
-  ai: '<span class="badge badge-ai" style="font-size:0.6rem">⬡ AI PREDICTED</span>',
-  ext: '<span class="badge badge-ext" style="font-size:0.6rem">↗ EXTERNAL</span>',
-  cached: '<span class="badge badge-warning" style="font-size:0.6rem">⏱ CACHED</span>',
-  demo: '<span style="padding:2px 6px;background:#F59E0B;color:white;border-radius:99px;font-size:0.6rem;font-weight:700">🎭 DEMO</span>',
+  iot: '<span class="badge badge-iot" style="font-size:0.6rem">â LIVE IoT</span>',
+  ai: '<span class="badge badge-ai" style="font-size:0.6rem">â¬¡ AI PREDICTED</span>',
+  ext: '<span class="badge badge-ext" style="font-size:0.6rem">â EXTERNAL</span>',
+  cached: '<span class="badge badge-warning" style="font-size:0.6rem">â± C°CHED</span>',
+  demo: '<span style="padding:2px 6px;background:#F59E0B;color:white;border-radius:99px;font-size:0.6rem;font-weight:700">ð­ DEMO</span>',
 };
 
-// ── DOM helpers ────────────────────────────────────────────
+// ââ DOM helpers ââââââââââââââââââââââââââââââââââââââââââââ
 const $ = id => document.getElementById(id);
 const $$ = sel => document.querySelectorAll(sel);
 
@@ -84,7 +84,7 @@ function formatTime(dateOrString) {
 }
 
 function formatRelativeTime(date) {
-  if (!date) return '—';
+  if (!date) return 'â';
   const d = new Date(date);
   const secs = Math.round((Date.now() - d.getTime()) / 1000);
   if (secs < 60) return 'Just now';
@@ -95,7 +95,7 @@ function formatRelativeTime(date) {
 
 function clampNum(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
-// ── Theme management ───────────────────────────────────────
+// ââ Theme management âââââââââââââââââââââââââââââââââââââââ
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   const icon = $('theme-icon');
@@ -111,7 +111,7 @@ function toggleTheme() {
   applyTheme(state.theme === 'dark' ? 'light' : 'dark');
 }
 
-// ── Dynamic weather background ─────────────────────────────
+// ââ Dynamic weather background âââââââââââââââââââââââââââââ
 function updateWeatherBackground(condition) {
   const bg = $('weather-bg');
   if (!bg) return;
@@ -165,7 +165,7 @@ function updateWeatherBackground(condition) {
   }
 }
 
-// ── Last Updated chip ──────────────────────────────────────
+// ââ Last Updated chip ââââââââââââââââââââââââââââââââââââââ
 function updateLastUpdatedChip() {
   const chip = $('last-updated-chip');
   const text = $('last-updated-text');
@@ -176,7 +176,7 @@ function updateLastUpdatedChip() {
   }
 }
 
-// ── Page navigation ────────────────────────────────────────
+// ââ Page navigation ââââââââââââââââââââââââââââââââââââââââ
 function navigateTo(page) {
   state.currentPage = page;
 
@@ -207,7 +207,7 @@ function navigateTo(page) {
   if (content) content.scrollTop = 0;
 }
 
-// ── IoT Status rendering ───────────────────────────────────
+// ââ IoT Status rendering âââââââââââââââââââââââââââââââââââ
 function renderIoTStatus(data) {
   const bar = $('iot-status-bar');
   const dot = $('iot-dot');
@@ -217,7 +217,7 @@ function renderIoTStatus(data) {
 
   const statusMap = {
     connected: { dotClass: 'connected', label: 'IoT Connected', barClass: '' },
-    syncing: { dotClass: 'syncing', label: 'Syncing…', barClass: 'syncing' },
+    syncing: { dotClass: 'syncing', label: 'Syncingâ¦', barClass: 'syncing' },
     offline: { dotClass: 'offline', label: 'Device Offline', barClass: 'offline' },
     error: { dotClass: 'error', label: 'Sensor Error', barClass: 'error' },
   };
@@ -229,13 +229,13 @@ function renderIoTStatus(data) {
   time.textContent = data.lastUpdate ? timeAgo(data.lastUpdate) : '';
 }
 
-// ── Location rendering ─────────────────────────────────────
+// ââ Location rendering âââââââââââââââââââââââââââââââââââââ
 function renderLocation(loc) {
   setText('location-city', loc.city);
   setText('location-detail', `${loc.state}, ${loc.country}`);
 }
 
-// ── Current weather card ───────────────────────────────────
+// ââ Current weather card âââââââââââââââââââââââââââââââââââ
 function renderCurrentWeather(data) {
   hide($('cw-skeleton'));
   hide($('cw-error'));
@@ -245,7 +245,7 @@ function renderCurrentWeather(data) {
   setText('cw-condition', getWeatherLabel(c.condition));
   setText('cw-icon', getWeatherIcon(c.condition));
   setText('cw-temp', Math.round(c.temperature));
-  setText('cw-feels', `${Math.round(c.feelsLike)}°C`);
+  setText('cw-feels', `${Math.round(c.feelsLike)}Â°C`);
   setText('cw-humidity', `${c.humidity}%`);
   setText('cw-wind', `${c.windSpeed} km/h ${c.windDirection}`);
   setText('cw-vis', `${c.visibility} km`);
@@ -255,16 +255,16 @@ function renderCurrentWeather(data) {
   const sumEl = $('conditions-summary');
   if (sumEl) {
     const items = [
-      { icon: '🌡️', label: 'Temp', value: `${c.temperature}°C`, source: 'IoT' },
-      { icon: '💧', label: 'Humidity', value: `${c.humidity}%`, source: 'IoT' },
-      { icon: '🫁', label: 'AQI', value: `${c.aqi}`, source: 'IoT' },
-      { icon: '☀️', label: 'UV', value: `${c.uvIndex}`, source: 'IoT' },
-      { icon: '🌬️', label: 'Pressure', value: `${c.pressure} hPa`, source: 'IoT' },
-      { icon: '💨', label: 'Wind', value: `${c.windSpeed} km/h`, source: 'IoT' },
-      { icon: '🌧️', label: 'Rain %', value: `${c.rainProbability || 0}%`, source: 'AI' },
-      { icon: '👁️', label: 'Visibility', value: `${c.visibility} km`, source: 'IoT' },
-      { icon: '🌡️', label: 'Dew Point', value: `${c.dewPoint || '—'}°C`, source: 'IoT' },
-      { icon: '⬆️', label: 'Trend', value: c.pressureTrend || '—', source: 'IoT' },
+      { icon: 'ð¡ï¸', label: 'Temp', value: `${c.temperature}Â°C`, source: 'IoT' },
+      { icon: 'ð§', label: 'Humidity', value: `${c.humidity}%`, source: 'IoT' },
+      { icon: 'ð«', label: 'AQI', value: `${c.aqi}`, source: 'IoT' },
+      { icon: 'âï¸', label: 'UV', value: `${c.uvIndex}`, source: 'IoT' },
+      { icon: 'ð¬ï¸', label: 'Pressure', value: `${c.pressure} hPa`, source: 'IoT' },
+      { icon: 'ð¨', label: 'Wind', value: `${c.windSpeed} km/h`, source: 'IoT' },
+      { icon: 'ð§ï¸', label: 'Rain %', value: `${c.rainProbability || 0}%`, source: 'AI' },
+      { icon: 'ðï¸', label: 'Visibility', value: `${c.visibility} km`, source: 'IoT' },
+      { icon: 'ð¡ï¸', label: 'Dew Point', value: `${c.dewPoint || 'â'}Â°C`, source: 'IoT' },
+      { icon: 'â¬ï¸', label: 'Trend', value: c.pressureTrend || 'â', source: 'IoT' },
     ];
     sumEl.innerHTML = items.slice(0, 5).map(it => `
       <div class="cs-item">
@@ -279,6 +279,12 @@ function renderCurrentWeather(data) {
   renderLocation(data.location);
   updateWeatherBackground(c.condition);
   updateWeatherCardAnimation(c.condition);
+  updateAqiCardImage(c.aqi);
+  if (data.daily && data.daily.length > 1) updateTomorrowCard(data.daily[1]);
+  
+  // Also update AQI number in UI if element exists
+  const aqiNumEl = document.querySelector('#aqi-card .wh-temp');
+  if (aqiNumEl) aqiNumEl.textContent = c.aqi;
   updateLastUpdatedChip();
 }
 
@@ -288,7 +294,7 @@ function renderCurrentWeatherError() {
   show($('cw-error'));
 }
 
-// ── Weather Score ──────────────────────────────────────────
+// ââ Weather Score ââââââââââââââââââââââââââââââââââââââââââ
 async function renderWeatherScore(iotData) {
   const wrap = $('weather-score-content');
   if (!wrap || !iotData?.current) return;
@@ -326,7 +332,7 @@ async function renderWeatherScore(iotData) {
   }
 }
 
-// ── Activity Scores ────────────────────────────────────────
+// ââ Activity Scores ââââââââââââââââââââââââââââââââââââââââ
 async function renderActivityScores(iotData) {
   const grid = $('activity-grid');
   if (!grid || !iotData?.current) return;
@@ -349,7 +355,7 @@ async function renderActivityScores(iotData) {
   }).join('');
 }
 
-// ── Weather Timeline ───────────────────────────────────────
+// ââ Weather Timeline âââââââââââââââââââââââââââââââââââââââ
 function renderWeatherTimeline(aiPrediction) {
   const container = $('weather-timeline');
   if (!container || !aiPrediction?.hourly) return;
@@ -359,8 +365,8 @@ function renderWeatherTimeline(aiPrediction) {
     <div class="timeline-item ${h.isNow ? 'now' : ''}" role="listitem">
       <div class="timeline-label">${h.isNow ? 'NOW' : '+' + (timeline.indexOf(h)) + 'h'}</div>
       <div class="timeline-icon">${getWeatherIcon(h.condition)}</div>
-      <div class="timeline-temp">${h.temperature}°C</div>
-      <div class="timeline-rain">💧 ${h.rainProbability}%</div>
+      <div class="timeline-temp">${h.temperature}Â°C</div>
+      <div class="timeline-rain">ð§ ${h.rainProbability}%</div>
       <div class="timeline-wind">${h.windSpeed} km/h</div>
     </div>`).join('');
 }
@@ -443,7 +449,7 @@ function calculateMoonPosition(date, lat, lon) {
   return { azimuth, elevation };
 }
 
-// ── Sunrise / Sunset ───────────────────────────────────────
+// ââ Sunrise / Sunset âââââââââââââââââââââââââââââââââââââââ
 function renderSunriseSunset(iotData) {
   const widget = $('sun-widget');
   if (!widget) return;
@@ -498,7 +504,7 @@ function renderSunriseSunset(iotData) {
         <span style="font-size:0.75rem;color:var(--text-3)">Local Sensor Unit</span>
       </div>
       <div class="rw-temp" style="font-size:1.5rem;font-weight:700;color:var(--accent)">
-        ${iotData?.current?.temperature || '--'}°C
+        ${iotData?.current?.temperature || '--'}Â°C
       </div>
     </div>
     <div class="sun-arc-container" style="padding:20px 0;">
@@ -511,15 +517,15 @@ function renderSunriseSunset(iotData) {
       <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.75rem;font-weight:600;">
         <div style="text-align:left;">Sunrise<br><span style="color:var(--text-3);font-weight:400">${sun.sunrise}</span></div>
         <div style="text-align:center;color:var(--text-2);font-weight:400;line-height:1.4;">
-          <span style="color:var(--accent)">Sun:</span> Az ${pos.azimuth.toFixed(1)}° El ${pos.elevation.toFixed(1)}°<br>
-          <span style="color:#94A3B8">Moon:</span> Az ${moonPos.azimuth.toFixed(1)}° El ${moonPos.elevation.toFixed(1)}°
+          <span style="color:var(--accent)">Sun:</span> Az ${pos.azimuth.toFixed(1)}Â° El ${pos.elevation.toFixed(1)}Â°<br>
+          <span style="color:#94A3B8">Moon:</span> Az ${moonPos.azimuth.toFixed(1)}Â° El ${moonPos.elevation.toFixed(1)}Â°
         </div>
         <div style="text-align:right;">Sunset<br><span style="color:var(--text-3);font-weight:400">${sun.sunset}</span></div>
       </div>
     </div>`;
 }
 
-// ── AI Prediction card ─────────────────────────────────────
+// ââ AI Prediction card âââââââââââââââââââââââââââââââââââââ
 function renderAIPredictionCard(data) {
   hide($('ai-skeleton'));
   hide($('ai-error'));
@@ -535,7 +541,7 @@ function renderAIPredictionCard(data) {
     <div class="ai-timeline-item ${h.isNow ? 'current-hour' : ''}" role="listitem">
       <span class="ai-time">${h.time}</span>
       <span class="ai-icon" aria-hidden="true">${getWeatherIcon(h.condition)}</span>
-      <span class="ai-temp">${h.temperature}°C</span>
+      <span class="ai-temp">${h.temperature}Â°C</span>
       <div class="ai-rain-prob">
         <i data-lucide="droplets" aria-hidden="true"></i>
         ${h.rainProbability}%
@@ -588,7 +594,7 @@ function renderMainTempChart(data) {
   if (currentChartMetric === 'temperature') {
     values = hourly.map(h => h.temperature);
     color = '#FF8A00'; // accent orange
-    unit = '°C';
+    unit = 'Â°C';
   } else if (currentChartMetric === 'rain') {
     values = hourly.map(h => h.rainProbability || 0);
     color = '#3B82F6'; // blue
@@ -611,11 +617,11 @@ function renderMainTempChart(data) {
   });
 }
 
-// ── Sensor grid (dashboard) ────────────────────────────────
+// ââ Sensor grid (dashboard) ââââââââââââââââââââââââââââââââ
 function getSensorValue(data, key) {
   const c = data.current;
   switch (key) {
-    case 'temperature': return { val: c.temperature, display: `${c.temperature}°C`, trend: getTrend(data.history, 'temperature') };
+    case 'temperature': return { val: c.temperature, display: `${c.temperature}Â°C`, trend: getTrend(data.history, 'temperature') };
     case 'humidity': return { val: c.humidity, display: `${c.humidity}%`, trend: getTrend(data.history, 'humidity') };
     case 'windSpeed': return { val: c.windSpeed, display: `${c.windSpeed}`, trend: null };
     case 'rain': return { val: c.rainfallMm, display: c.rain ? `${c.rainfallMm} mm` : 'No Rain', trend: null };
@@ -623,7 +629,7 @@ function getSensorValue(data, key) {
     case 'uvIndex': return { val: c.uvIndex, display: `${c.uvIndex}`, trend: null };
     case 'pressure': return { val: c.pressure, display: `${c.pressure}`, trend: c.pressureTrend };
     case 'visibility': return { val: c.visibility, display: `${c.visibility}`, trend: null };
-    default: return { val: 0, display: '—', trend: null };
+    default: return { val: 0, display: 'â', trend: null };
   }
 }
 
@@ -632,9 +638,9 @@ function getTrend(history, key) {
   const recent = history.slice(-6).map(h => h[key]).filter(v => v != null);
   if (recent.length < 2) return null;
   const diff = recent[recent.length - 1] - recent[0];
-  if (diff > 0.5) return { dir: 'up', label: `↑ ${Math.abs(diff).toFixed(1)}` };
-  if (diff < -0.5) return { dir: 'down', label: `↓ ${Math.abs(diff).toFixed(1)}` };
-  return { dir: 'stable', label: '→ Stable' };
+  if (diff > 0.5) return { dir: 'up', label: `â ${Math.abs(diff).toFixed(1)}` };
+  if (diff < -0.5) return { dir: 'down', label: `â ${Math.abs(diff).toFixed(1)}` };
+  return { dir: 'stable', label: 'â Stable' };
 }
 
 function getSensorStatus(key, val) {
@@ -700,7 +706,7 @@ function renderSensorGrid(data) {
         </div>
         <div class="sc-label">${sensor.label}</div>
         <div class="sc-value" aria-live="polite">
-          ${display.includes('°') || display.includes('%') || display.includes('km') || display.includes('hPa')
+          ${display.includes('Â°') || display.includes('%') || display.includes('km') || display.includes('hPa')
         ? display
         : `${display}<span class="sc-unit">${sensor.unit}</span>`}
         </div>
@@ -715,17 +721,17 @@ function renderSensorGrid(data) {
   });
 }
 
-// ── Hourly forecast ────────────────────────────────────────
+// ââ Hourly forecast ââââââââââââââââââââââââââââââââââââââââ
 function renderHourlyForecast(data) {
   const container = $('hourly-scroll');
   if (!container) return;
 
   container.innerHTML = data.hourly.slice(0, 12).map(h => `
     <div class="hourly-item ${h.isNow ? 'current-hour' : ''}" role="listitem"
-         aria-label="${h.time}: ${getWeatherLabel(h.condition)}, ${h.temperature}°C">
+         aria-label="${h.time}: ${getWeatherLabel(h.condition)}, ${h.temperature}Â°C">
       <div class="hourly-time">${h.isNow ? 'Now' : h.time}</div>
       <div class="hourly-icon" aria-hidden="true">${getWeatherIcon(h.condition)}</div>
-      <div class="hourly-temp">${h.temperature}°C</div>
+      <div class="hourly-temp">${h.temperature}Â°C</div>
       <div class="hourly-rain" aria-label="${h.rainProbability}% rain chance">
         <i data-lucide="droplets" style="width:10px;height:10px"></i>
         ${h.rainProbability}%
@@ -736,14 +742,14 @@ function renderHourlyForecast(data) {
   lucide.createIcons();
 }
 
-// ── 7-Day forecast ─────────────────────────────────────────
+// ââ 7-Day forecast âââââââââââââââââââââââââââââââââââââââââ
 function renderSevenDayForecast(data) {
   const list = $('seven-day-list');
   if (!list) return;
 
   list.innerHTML = data.daily.map((d, i) => `
     <div class="forecast-row ${i === 0 ? 'today' : ''}" role="listitem"
-         aria-label="${d.day}: ${getWeatherLabel(d.condition)}, high ${d.high}°C low ${d.low}°C">
+         aria-label="${d.day}: ${getWeatherLabel(d.condition)}, high ${d.high}Â°C low ${d.low}Â°C">
       <span class="fr-day">${d.day}</span>
       <span class="fr-icon" aria-hidden="true">${getWeatherIcon(d.condition)}</span>
       <span class="fr-desc">${getWeatherLabel(d.condition)}</span>
@@ -751,7 +757,7 @@ function renderSevenDayForecast(data) {
         <i data-lucide="droplets"></i>${d.rainProbability}%
       </span>
       <span class="fr-temps">
-        ${d.high}° <span class="fr-low">/ ${d.low}°</span>
+        ${d.high}Â° <span class="fr-low">/ ${d.low}Â°</span>
       </span>
     </div>
   `).join('');
@@ -759,7 +765,7 @@ function renderSevenDayForecast(data) {
   lucide.createIcons();
 }
 
-// ── Recommendations ────────────────────────────────────────
+// ââ Recommendations ââââââââââââââââââââââââââââââââââââââââ
 function renderRecommendations(iotData) {
   const list = $('reco-list');
   const doDontWrap = $('do-dont-wrap');
@@ -776,18 +782,18 @@ function renderRecommendations(iotData) {
         <div class="reco-message">${r.message}</div>
       </div>
     </div>
-  `).join('') || '<div class="reco-item type-info"><span class="reco-icon">✅</span><div><div class="reco-title">All Good</div><div class="reco-message">Current conditions are comfortable.</div></div></div>';
+  `).join('') || '<div class="reco-item type-info"><span class="reco-icon">â</span><div><div class="reco-title">All Good</div><div class="reco-message">Current conditions are comfortable.</div></div></div>';
 
   if (doDontWrap) {
     doDontWrap.innerHTML = `
       <div class="do-col">
-        <h4>✓ DO</h4>
+        <h4>â DO</h4>
         <ul class="do-list">
           ${doDont.dos.slice(0, 4).map(d => `<li>${d}</li>`).join('')}
         </ul>
       </div>
       <div class="dont-col">
-        <h4>✕ DON'T</h4>
+        <h4>â DON'T</h4>
         <ul class="dont-list">
           ${doDont.donts.slice(0, 4).map(d => `<li>${d}</li>`).join('')}
         </ul>
@@ -795,7 +801,7 @@ function renderRecommendations(iotData) {
   }
 }
 
-// ── Safety alerts ──────────────────────────────────────────
+// ââ Safety alerts ââââââââââââââââââââââââââââââââââââââââââ
 function renderSafetyAlerts(iotData) {
   const container = $('safety-alerts');
   if (!container) return;
@@ -804,7 +810,7 @@ function renderSafetyAlerts(iotData) {
   if (alerts.length === 0) {
     container.innerHTML = `
       <div class="safety-ok" role="status">
-        <span class="ok-icon">✅</span>
+        <span class="ok-icon">â</span>
         <span>No active weather warnings. Conditions are safe.</span>
       </div>`;
     return;
@@ -824,7 +830,7 @@ function renderSafetyAlerts(iotData) {
   `).join('');
 }
 
-// ── Sensor detail modal (enhanced) ────────────────────────
+// ââ Sensor detail modal (enhanced) ââââââââââââââââââââââââ
 function openSensorModal(sensorKey) {
   const sensor = SENSORS.find(s => s.key === sensorKey);
   if (!sensor || !state.iotData) return;
@@ -836,10 +842,10 @@ function openSensorModal(sensorKey) {
 
   const histVals = getSparklineData(history, sensorKey).filter(v => v != null);
   const allHist = history.map(h => h[sensorKey]).filter(v => v != null);
-  const minVal = allHist.length ? Math.min(...allHist).toFixed(1) : '—';
-  const maxVal = allHist.length ? Math.max(...allHist).toFixed(1) : '—';
-  const avgVal = allHist.length ? (allHist.reduce((a, b) => a + b, 0) / allHist.length).toFixed(1) : '—';
-  const lastUpdate = data.lastUpdate ? timeAgo(data.lastUpdate) : '—';
+  const minVal = allHist.length ? Math.min(...allHist).toFixed(1) : 'â';
+  const maxVal = allHist.length ? Math.max(...allHist).toFixed(1) : 'â';
+  const avgVal = allHist.length ? (allHist.reduce((a, b) => a + b, 0) / allHist.length).toFixed(1) : 'â';
+  const lastUpdate = data.lastUpdate ? timeAgo(data.lastUpdate) : 'â';
 
   const histLabels = history.slice(-16).map(h => formatTime(h.timestamp));
 
@@ -866,21 +872,21 @@ function openSensorModal(sensorKey) {
   if (sensorKey === 'aqi') {
     const aqiInfo = aqiCategory(val);
     extraHtml = `<div style="padding:8px 12px;background:${aqiInfo.color}15;border-radius:var(--radius-sm);margin-top:8px;font-size:0.875rem">
-      <strong style="color:${aqiInfo.color}">${aqiInfo.label}</strong> — AQI ${val}</div>`;
+      <strong style="color:${aqiInfo.color}">${aqiInfo.label}</strong> â AQI ${val}</div>`;
   }
 
   // Check for anomaly
   const anomaly = state.anomalies?.find(a => a.type === sensorKey);
   const anomalyHtml = anomaly ? `
     <div style="margin-top:12px;padding:10px 14px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--radius-sm);font-size:0.8125rem">
-      ⚠️ <strong>${anomaly.title}</strong> — ${anomaly.possibleCause}
+      â ï¸ <strong>${anomaly.title}</strong> â ${anomaly.possibleCause}
     </div>` : '';
 
   $('modal-header').innerHTML = `
     <div class="modal-header-icon" style="background:${sensor.color}18" aria-hidden="true">${sensor.icon}</div>
     <div>
       <div class="modal-title">${sensor.label}</div>
-      <div class="modal-subtitle">Live IoT · Updated ${lastUpdate}</div>
+      <div class="modal-subtitle">Live IoT Â· Updated ${lastUpdate}</div>
     </div>`;
 
   $('modal-body').innerHTML = `
@@ -919,7 +925,7 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
-// ── Sensors page ───────────────────────────────────────────
+// ââ Sensors page âââââââââââââââââââââââââââââââââââââââââââ
 async function renderSensorsPage() {
   const grid = $('sensor-grid-detailed');
   if (!grid || !state.iotData) {
@@ -970,7 +976,7 @@ async function renderSensorsPage() {
   lucide.createIcons();
 }
 
-// ── IoT Device Health ──────────────────────────────────────
+// ââ IoT Device Health ââââââââââââââââââââââââââââââââââââââ
 async function renderDeviceHealth(iotData) {
   const content = $('device-health-content');
   const badge = $('device-status-badge');
@@ -984,26 +990,26 @@ async function renderDeviceHealth(iotData) {
 
     if (badge) {
       badge.className = `model-status-badge ${online ? 'healthy' : 'warning'}`;
-      badge.textContent = online ? '● Healthy' : '⚠ Offline';
+      badge.textContent = online ? 'â Healthy' : 'â  Offline';
     }
 
     content.innerHTML = `
       <div class="device-hero">
         <div class="device-status-icon ${online ? 'online' : 'offline'}">
-          ${online ? '📡' : '📵'}
+          ${online ? 'ð¡' : 'ðµ'}
         </div>
         <div class="device-info-header">
           <h3>${device.name}</h3>
-          <p>${device.id} · Firmware ${device.firmware}</p>
+          <p>${device.id} Â· Firmware ${device.firmware}</p>
           <div class="device-meta-row">
             <div class="device-meta-badge ${online ? 'online' : 'offline'}">
-              ${online ? '● Online' : '● Offline'}
+              ${online ? 'â Online' : 'â Offline'}
             </div>
-            <div class="device-meta-badge">🔋 ${device.battery}%</div>
-            <div class="device-meta-badge">📶 ${device.wifiQuality}</div>
-            <div class="device-meta-badge">⏱ Uptime: ${device.uptime}h</div>
-            <div class="device-meta-badge">📊 ${health.totalReadingsToday} readings today</div>
-            <div class="device-meta-badge">📍 ${device.location.city}</div>
+            <div class="device-meta-badge">ð ${device.battery}%</div>
+            <div class="device-meta-badge">ð¶ ${device.wifiQuality}</div>
+            <div class="device-meta-badge">â± Uptime: ${device.uptime}h</div>
+            <div class="device-meta-badge">ð ${health.totalReadingsToday} readings today</div>
+            <div class="device-meta-badge">ð ${device.location.city}</div>
           </div>
         </div>
       </div>
@@ -1017,7 +1023,7 @@ async function renderDeviceHealth(iotData) {
             <div class="shi-icon">${s.icon}</div>
             <div class="shi-info">
               <div class="shi-name">${s.name}</div>
-              <div class="shi-val">${s.value} · ${statusLabel} · ${minsSince < 1 ? 'now' : minsSince + 'm ago'}</div>
+              <div class="shi-val">${s.value} Â· ${statusLabel} Â· ${minsSince < 1 ? 'now' : minsSince + 'm ago'}</div>
             </div>
             <div class="shi-dot ${statusCls}"></div>
           </div>`;
@@ -1028,7 +1034,7 @@ async function renderDeviceHealth(iotData) {
   }
 }
 
-// ── Anomaly Detection ──────────────────────────────────────
+// ââ Anomaly Detection ââââââââââââââââââââââââââââââââââââââ
 async function renderAnomalyDetection(iotData) {
   const content = $('anomaly-content');
   if (!content || !iotData) return;
@@ -1040,7 +1046,7 @@ async function renderAnomalyDetection(iotData) {
     if (anomalies.length === 0) {
       content.innerHTML = `
         <div class="anomaly-ok">
-          <span style="font-size:1.5rem">✅</span>
+          <span style="font-size:1.5rem">â</span>
           <div>
             <strong>All readings are within normal ranges.</strong><br>
             <span style="font-size:0.8125rem;color:var(--text-3)">Continuous statistical monitoring is active. Z-score and IQR checks passed.</span>
@@ -1057,7 +1063,7 @@ async function renderAnomalyDetection(iotData) {
             <div class="anomaly-body">
               <div class="anomaly-title">${a.title}</div>
               <div class="anomaly-detail">
-                Current: <strong>${a.current}</strong> — Expected range: ${a.expected}
+                Current: <strong>${a.current}</strong> â Expected range: ${a.expected}
               </div>
               <div class="anomaly-detail" style="margin-top:4px;font-style:italic">
                 Possible cause: ${a.possibleCause}
@@ -1077,11 +1083,11 @@ async function renderAnomalyDetection(iotData) {
   }
 }
 
-// ── AI full page ───────────────────────────────────────────
+// ââ AI full page âââââââââââââââââââââââââââââââââââââââââââ
 function renderAIPage() {
   const container = $('ai-full-content');
   if (!container || !state.aiPrediction) {
-    if (container) container.innerHTML = renderSkeletonState('AI prediction loading…');
+    if (container) container.innerHTML = renderSkeletonState('AI prediction loadingâ¦');
     return;
   }
 
@@ -1089,17 +1095,17 @@ function renderAIPage() {
   const histTemps = data.hourly.map(h => h.temperature);
   const histLabels = data.hourly.slice(0, 16).map(h => h.time);
   const chart = Charts.areaChart(histTemps.slice(0, 16), histLabels, {
-    color: '#8B5CF6', fillFrom: '#8B5CF6', unit: '°C', w: 680, h: 160
+    color: '#8B5CF6', fillFrom: '#8B5CF6', unit: 'Â°C', w: 680, h: 160
   });
 
   container.innerHTML = `
     <div class="card" style="margin-bottom:16px">
       <div class="section-header">
         <div>
-          <h3>Temperature Forecast — Next 24 Hours</h3>
-          <p style="margin-top:4px;font-size:0.8125rem;color:var(--text-3)">Model: ${data.modelVersion} · ${data.dataPoints?.toLocaleString()} training points · ${data.confidence}% confidence</p>
+          <h3>Temperature Forecast â Next 24 Hours</h3>
+          <p style="margin-top:4px;font-size:0.8125rem;color:var(--text-3)">Model: ${data.modelVersion} Â· ${data.dataPoints?.toLocaleString()} training points Â· ${data.confidence}% confidence</p>
         </div>
-        <span class="badge badge-ai">⬡ AI PREDICTED</span>
+        <span class="badge badge-ai">â¬¡ AI PREDICTED</span>
       </div>
       <div style="margin-top:8px;overflow:hidden;border-radius:var(--radius-md);background:var(--surface-2);padding:12px">
         ${chart}
@@ -1125,7 +1131,7 @@ function renderAIPage() {
               <tr style="${h.isNow ? 'background:var(--ai-bg);font-weight:600' : ''};border-bottom:1px solid var(--border)">
                 <td style="padding:8px 12px">${h.isNow ? '<strong>Now</strong>' : h.time}</td>
                 <td style="padding:8px 12px">${getWeatherIcon(h.condition)} ${getWeatherLabel(h.condition)}</td>
-                <td style="padding:8px 12px;text-align:right;font-weight:600">${h.temperature}°C</td>
+                <td style="padding:8px 12px;text-align:right;font-weight:600">${h.temperature}Â°C</td>
                 <td style="padding:8px 12px;text-align:right">${h.humidity}%</td>
                 <td style="padding:8px 12px;text-align:right;color:#60A5FA">${h.rainProbability}%</td>
                 <td style="padding:8px 12px;text-align:right">${h.windSpeed} km/h</td>
@@ -1137,18 +1143,18 @@ function renderAIPage() {
     </div>
     <div class="card" style="padding:14px 16px;background:var(--ai-bg);border:1px solid var(--ai-border)">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-        <span style="font-size:1.2rem">🤖</span>
+        <span style="font-size:1.2rem">ð¤</span>
         <strong style="color:var(--ai-color)">AI Summary</strong>
         <span class="badge badge-ai" style="margin-left:auto">Generated by Local AI Model</span>
       </div>
       <p style="color:var(--text-2);line-height:1.6">${data.summary}</p>
       <p style="font-size:0.75rem;color:var(--text-3);margin-top:8px">
-        Generated: ${formatTime(data.generated)} · Confidence: ${data.confidence}% · Model: ${data.modelVersion}
+        Generated: ${formatTime(data.generated)} Â· Confidence: ${data.confidence}% Â· Model: ${data.modelVersion}
       </p>
     </div>`;
 }
 
-// ── AI Lab page ────────────────────────────────────────────
+// ââ AI Lab page ââââââââââââââââââââââââââââââââââââââââââââ
 async function renderAILabPage() {
   // Model performance
   await loadAndRenderModelPerformance();
@@ -1175,7 +1181,7 @@ async function loadAndRenderModelPerformance() {
 
     if (badge) {
       badge.className = `model-status-badge ${perf.status}`;
-      badge.textContent = `● ${perf.status.charAt(0).toUpperCase() + perf.status.slice(1)}`;
+      badge.textContent = `â ${perf.status.charAt(0).toUpperCase() + perf.status.slice(1)}`;
     }
 
     grid.innerHTML = [
@@ -1198,9 +1204,9 @@ async function loadAndRenderModelPerformance() {
           <div>
             <h4 style="font-size:0.8125rem;color:var(--text-3);margin-bottom:10px">Temperature Model</h4>
             ${pm.temperature.available ? `
-            <div class="metric-row"><span class="metric-name">MAE</span><span class="metric-value">${pm.temperature.mae}°C</span></div>
-            <div class="metric-row"><span class="metric-name">RMSE</span><span class="metric-value">${pm.temperature.rmse}°C</span></div>
-            <div class="metric-row"><span class="metric-name">R²</span><span class="metric-value">${pm.temperature.r2}</span></div>
+            <div class="metric-row"><span class="metric-name">MAE</span><span class="metric-value">${pm.temperature.mae}Â°C</span></div>
+            <div class="metric-row"><span class="metric-name">RMSE</span><span class="metric-value">${pm.temperature.rmse}Â°C</span></div>
+            <div class="metric-row"><span class="metric-name">RÂ²</span><span class="metric-value">${pm.temperature.r2}</span></div>
             ` : '<div class="metric-na">Not available yet</div>'}
           </div>
           <div>
@@ -1213,11 +1219,11 @@ async function loadAndRenderModelPerformance() {
           </div>
           <div>
             <h4 style="font-size:0.8125rem;color:var(--text-3);margin-bottom:10px">AQI Model</h4>
-            <div class="metric-na" style="padding:12px 0;font-size:0.8125rem">⚠ Not available yet<br><span style="font-size:0.75rem">Requires additional sensor calibration data.</span></div>
+            <div class="metric-na" style="padding:12px 0;font-size:0.8125rem">â  Not available yet<br><span style="font-size:0.75rem">Requires additional sensor calibration data.</span></div>
           </div>
           <div>
             <h4 style="font-size:0.8125rem;color:var(--text-3);margin-bottom:10px">Wind Model</h4>
-            <div class="metric-na" style="padding:12px 0;font-size:0.8125rem">⚠ Not available yet<br><span style="font-size:0.75rem">Wind speed prediction model in development.</span></div>
+            <div class="metric-na" style="padding:12px 0;font-size:0.8125rem">â  Not available yet<br><span style="font-size:0.75rem">Wind speed prediction model in development.</span></div>
           </div>
         </div>`;
     }
@@ -1250,8 +1256,8 @@ async function loadAndRenderAIVsActual() {
           <div class="model-info-stat"><div class="mis-label">Overall Accuracy</div><div class="mis-value" style="color:var(--primary)">${s.overallAccuracy}%</div></div>
           <div class="model-info-stat"><div class="mis-label">Temp Accuracy</div><div class="mis-value">${s.temperatureAccuracy}%</div></div>
           <div class="model-info-stat"><div class="mis-label">Humidity Accuracy</div><div class="mis-value">${s.humidityAccuracy}%</div></div>
-          <div class="model-info-stat"><div class="mis-label">Temp MAE</div><div class="mis-value">${s.mae}°C</div></div>
-          <div class="model-info-stat"><div class="mis-label">RMSE</div><div class="mis-value">${s.rmse}°C</div></div>
+          <div class="model-info-stat"><div class="mis-label">Temp MAE</div><div class="mis-value">${s.mae}Â°C</div></div>
+          <div class="model-info-stat"><div class="mis-label">RMSE</div><div class="mis-value">${s.rmse}Â°C</div></div>
           <div class="model-info-stat"><div class="mis-label">Data Points</div><div class="mis-value">${s.dataPoints}</div></div>
         </div>`;
     }
@@ -1266,10 +1272,10 @@ async function loadAndRenderAIVsActual() {
           ${Charts.multiLineChart([
         { label: 'AI Predicted', values: predicted, color: '#8B5CF6', dashed: true },
         { label: 'Actual (IoT)', values: actual, color: '#10B981', dashed: false },
-      ], labels, { unit: '°C' })}
+      ], labels, { unit: 'Â°C' })}
           <div style="display:flex;gap:16px;margin-top:8px;font-size:0.75rem">
-            <span style="color:#8B5CF6">— — AI Predicted</span>
-            <span style="color:#10B981">—— Actual (IoT)</span>
+            <span style="color:#8B5CF6">â â AI Predicted</span>
+            <span style="color:#10B981">ââ Actual (IoT)</span>
           </div>
         </div>`;
     }
@@ -1295,9 +1301,9 @@ async function loadAndRenderAIVsActual() {
         return `
               <tr>
                 <td>${v.time}</td>
-                <td>${v.predicted.temperature}°C</td>
-                <td>${v.actual.temperature}°C</td>
-                <td>${v.errors.temperature}°C</td>
+                <td>${v.predicted.temperature}Â°C</td>
+                <td>${v.actual.temperature}Â°C</td>
+                <td>${v.errors.temperature}Â°C</td>
                 <td><span class="acc-chip ${tempCls}">${v.accuracies.temperature}%</span></td>
                 <td><span class="acc-chip ${humCls}">${v.accuracies.humidity}%</span></td>
               </tr>`;
@@ -1378,8 +1384,8 @@ function renderModelComparison() {
         ${models.map(m => `
           <tr class="${m.highlight ? 'best-model' : ''}">
             <td>${m.name}${m.highlight ? '<span class="best-badge">CURRENT</span>' : ''}</td>
-            <td>${m.temp_mae}°C</td>
-            <td>${m.temp_rmse}°C</td>
+            <td>${m.temp_mae}Â°C</td>
+            <td>${m.temp_rmse}Â°C</td>
             <td>${m.rain_acc}%</td>
             <td>${m.latency}ms</td>
           </tr>`).join('')}
@@ -1402,7 +1408,7 @@ function renderLocalVsExternal() {
   if (!result.available) {
     content.innerHTML = `
       <div style="padding:24px;text-align:center;color:var(--text-3)">
-        <div style="font-size:2rem;margin-bottom:8px">📍</div>
+        <div style="font-size:2rem;margin-bottom:8px">ð</div>
         <p style="font-size:0.875rem">${result.reason}</p>
         <button class="btn-add-location" style="margin:12px auto;display:flex" onclick="navigateTo('search')">
           Search Location
@@ -1416,8 +1422,8 @@ function renderLocalVsExternal() {
       <thead>
         <tr>
           <th>Parameter</th>
-          <th>🏠 ${result.iotLocation}</th>
-          <th>🌐 ${result.externalLocation}</th>
+          <th>ð  ${result.iotLocation}</th>
+          <th>ð ${result.externalLocation}</th>
           <th>Difference</th>
         </tr>
       </thead>
@@ -1433,7 +1439,7 @@ function renderLocalVsExternal() {
           </tr>`).join('')}
       </tbody>
     </table>
-    <div class="lve-insight">💡 ${result.insight}</div>`;
+    <div class="lve-insight">ð¡ ${result.insight}</div>`;
 
   // Also render on search page
   const searchResult = $('local-vs-ext-search');
@@ -1442,14 +1448,14 @@ function renderLocalVsExternal() {
     searchResult.innerHTML = `
       <div class="card">
         <div class="section-header" style="margin-bottom:12px">
-          <h3>📍 Local vs External Comparison</h3>
+          <h3>ð Local vs External Comparison</h3>
         </div>
         <table class="lve-table">
           <thead>
             <tr>
               <th>Parameter</th>
-              <th>🏠 Local IoT</th>
-              <th>🌐 ${result.externalLocation}</th>
+              <th>ð  Local IoT</th>
+              <th>ð ${result.externalLocation}</th>
               <th>Difference</th>
             </tr>
           </thead>
@@ -1465,16 +1471,16 @@ function renderLocalVsExternal() {
               </tr>`).join('')}
           </tbody>
         </table>
-        <div class="lve-insight">💡 ${result.insight}</div>
+        <div class="lve-insight">ð¡ ${result.insight}</div>
       </div>`;
   }
 }
 
-// ── Forecast page ──────────────────────────────────────────
+// ââ Forecast page ââââââââââââââââââââââââââââââââââââââââââ
 function renderForecastPage() {
   const container = $('forecast-full-content');
   if (!container || !state.aiPrediction) {
-    if (container) container.innerHTML = renderSkeletonState('Loading forecast…');
+    if (container) container.innerHTML = renderSkeletonState('Loading forecastâ¦');
     return;
   }
 
@@ -1491,13 +1497,13 @@ function renderForecastPage() {
             <div style="flex:1;margin-left:8px">
               <div style="display:flex;align-items:center;gap:6px;font-size:0.8125rem;color:var(--text-3)">
                 <i data-lucide="droplets" style="width:12px;height:12px"></i> ${d.rainProbability}% rain
-                &nbsp;·&nbsp;
+                &nbsp;Â·&nbsp;
                 <i data-lucide="wind" style="width:12px;height:12px"></i> ${d.wind} km/h
-                &nbsp;·&nbsp;
-                💧 ${d.humidity}% humid
+                &nbsp;Â·&nbsp;
+                ð§ ${d.humidity}% humid
               </div>
             </div>
-            <span class="fr-temps">${d.high}° <span class="fr-low">/ ${d.low}°</span></span>
+            <span class="fr-temps">${d.high}Â° <span class="fr-low">/ ${d.low}Â°</span></span>
           </div>`).join('')}
       </div>
     </div>`;
@@ -1505,11 +1511,11 @@ function renderForecastPage() {
   lucide.createIcons();
 }
 
-// ── Intelligence page ──────────────────────────────────────
+// ââ Intelligence page ââââââââââââââââââââââââââââââââââââââ
 function renderIntelligencePage() {
   const container = $('intelligence-full-content');
   if (!container || !state.iotData) {
-    if (container) container.innerHTML = renderSkeletonState('Loading…');
+    if (container) container.innerHTML = renderSkeletonState('Loadingâ¦');
     return;
   }
 
@@ -1537,11 +1543,11 @@ function renderIntelligencePage() {
         <div class="section-header"><h3>Do's &amp; Don'ts</h3></div>
         <div class="do-dont">
           <div class="do-col">
-            <h4>✓ DO</h4>
+            <h4>â DO</h4>
             <ul class="do-list">${doDont.dos.map(d => `<li>${d}</li>`).join('')}</ul>
           </div>
           <div class="dont-col">
-            <h4>✕ DON'T</h4>
+            <h4>â DON'T</h4>
             <ul class="dont-list">${doDont.donts.map(d => `<li>${d}</li>`).join('')}</ul>
           </div>
         </div>
@@ -1551,7 +1557,7 @@ function renderIntelligencePage() {
       <div class="section-header"><h3>Safety Status</h3></div>
       <div class="safety-alerts">
         ${alerts.length === 0
-      ? `<div class="safety-ok"><span class="ok-icon">✅</span><span>No active warnings. All conditions are within safe ranges.</span></div>`
+      ? `<div class="safety-ok"><span class="ok-icon">â</span><span>No active warnings. All conditions are within safe ranges.</span></div>`
       : alerts.map(a => `
             <div class="safety-alert level-${a.level}">
               <div class="alert-icon">${a.icon}</div>
@@ -1565,7 +1571,7 @@ function renderIntelligencePage() {
     </div>`;
 }
 
-// ── Analytics page ─────────────────────────────────────────
+// ââ Analytics page âââââââââââââââââââââââââââââââââââââââââ
 async function renderAnalyticsPage() {
   await loadHistoricalData(state.analyticsRange);
   renderSystemAnalytics();
@@ -1591,7 +1597,7 @@ async function loadHistoricalData(range) {
     if (title) {
       const sensorName = sensorDef.label;
       const rangeLabel = { '1h': 'Last 1h', '6h': 'Last 6h', '12h': 'Last 12h', '24h': 'Last 24h', '7d': 'Last 7 days', '30d': 'Last 30 days' }[range] || range;
-      title.textContent = `${sensorName} — ${rangeLabel}`;
+      title.textContent = `${sensorName} â ${rangeLabel}`;
     }
 
     if (chartWrap && values.length > 2) {
@@ -1633,14 +1639,14 @@ async function renderSystemAnalytics() {
     state.systemAnalytics = analytics;
 
     const items = [
-      { icon: '📡', value: analytics.totalReadings.toLocaleString(), label: 'Total Readings' },
-      { icon: '🤖', value: analytics.totalPredictions.toLocaleString(), label: 'Total Predictions' },
-      { icon: '🎯', value: analytics.averageAccuracy + '%', label: 'Avg Accuracy' },
-      { icon: '⚡', value: analytics.totalAnomalies, label: 'Anomalies Detected' },
-      { icon: '🔔', value: analytics.totalAlerts, label: 'Alerts Generated' },
-      { icon: '📶', value: analytics.iotUptime + '%', label: 'IoT Uptime' },
-      { icon: '🗃️', value: analytics.dataAvailability + '%', label: 'Data Availability' },
-      { icon: '⏱', value: analytics.avgResponseTime, label: 'Avg Response Time' },
+      { icon: 'ð¡', value: analytics.totalReadings.toLocaleString(), label: 'Total Readings' },
+      { icon: 'ð¤', value: analytics.totalPredictions.toLocaleString(), label: 'Total Predictions' },
+      { icon: 'ð¯', value: analytics.averageAccuracy + '%', label: 'Avg Accuracy' },
+      { icon: 'â¡', value: analytics.totalAnomalies, label: 'Anomalies Detected' },
+      { icon: 'ð', value: analytics.totalAlerts, label: 'Alerts Generated' },
+      { icon: 'ð¶', value: analytics.iotUptime + '%', label: 'IoT Uptime' },
+      { icon: 'ðï¸', value: analytics.dataAvailability + '%', label: 'Data Availability' },
+      { icon: 'â±', value: analytics.avgResponseTime, label: 'Avg Response Time' },
     ];
 
     grid.innerHTML = items.map(it => `
@@ -1654,14 +1660,14 @@ async function renderSystemAnalytics() {
   }
 }
 
-// ── Map page ───────────────────────────────────────────────
+// ââ Map page âââââââââââââââââââââââââââââââââââââââââââââââ
 function renderMapPage() {
   const stationReadings = $('map-station-readings');
   if (!stationReadings || !state.iotData?.current) return;
 
   const c = state.iotData.current;
   stationReadings.innerHTML = [
-    { label: 'Temperature', value: `${c.temperature}°C` },
+    { label: 'Temperature', value: `${c.temperature}Â°C` },
     { label: 'Humidity', value: `${c.humidity}%` },
     { label: 'AQI', value: `${c.aqi}` },
     { label: 'Wind', value: `${c.windSpeed} km/h` },
@@ -1672,7 +1678,7 @@ function renderMapPage() {
     </div>`).join('');
 }
 
-// ── Search page ────────────────────────────────────────────
+// ââ Search page ââââââââââââââââââââââââââââââââââââââââââââ
 function renderSearchResults(results, containerId) {
   const container = $(containerId);
   if (!container) return;
@@ -1680,7 +1686,7 @@ function renderSearchResults(results, containerId) {
   if (!results || results.length === 0) {
     container.innerHTML = `
       <div class="state-card">
-        <div class="state-icon">🔍</div>
+        <div class="state-icon">ð</div>
         <div class="state-title">No results found</div>
         <div class="state-msg">Try a different city name</div>
       </div>`;
@@ -1715,7 +1721,7 @@ async function loadExternalWeather(loc) {
   show(resultDiv);
   resultDiv.innerHTML = `<div class="card" style="text-align:center;padding:32px">
     <div class="spinner" style="margin:0 auto"></div>
-    <p style="margin-top:10px;color:var(--text-3)">Loading weather for ${loc.city}…</p>
+    <p style="margin-top:10px;color:var(--text-3)">Loading weather for ${loc.city}â¦</p>
   </div>`;
 
   try {
@@ -1730,7 +1736,7 @@ async function loadExternalWeather(loc) {
     if (lveSearch) lveSearch.style.display = '';
   } catch {
     resultDiv.innerHTML = `<div class="state-card card">
-      <div class="state-icon">⚠️</div>
+      <div class="state-icon">â ï¸</div>
       <div class="state-title">Weather Unavailable</div>
       <div class="state-msg">Could not load weather for ${loc.city}. Try again.</div>
     </div>`;
@@ -1746,7 +1752,7 @@ function renderExternalWeatherCard(data, container) {
     <div class="card ext-weather-card">
       <div class="ext-header">
         <div>
-          <span class="badge badge-ext">↗ EXTERNAL WEATHER</span>
+          <span class="badge badge-ext">â EXTERNAL WEATHER</span>
           <div style="margin-top:8px">
             <div style="font-size:1rem;font-weight:700">${loc.city}</div>
             <div style="font-size:0.8125rem;color:var(--text-3)">${loc.state}, ${loc.country}</div>
@@ -1757,16 +1763,16 @@ function renderExternalWeatherCard(data, container) {
       ? `<button class="btn-add-location" id="save-ext-loc" data-loc='${JSON.stringify(loc)}'>
                 <i data-lucide="bookmark-plus"></i> Save Location
                </button>`
-      : `<span class="badge badge-success">✓ Saved</span>`}
+      : `<span class="badge badge-success">â Saved</span>`}
         </div>
       </div>
       <div class="ext-temp-row">
         <div class="ext-icon" aria-hidden="true">${getWeatherIcon(c.condition)}</div>
         <div class="ext-temp">${Math.round(c.temperature)}</div>
-        <div class="ext-unit">°C</div>
+        <div class="ext-unit">Â°C</div>
         <div style="margin-left:12px">
           <div style="font-size:1.1rem;font-weight:600;color:var(--text-1)">${getWeatherLabel(c.condition)}</div>
-          <div style="font-size:0.875rem;color:var(--text-3)">Feels like ${Math.round(c.feelsLike)}°C</div>
+          <div style="font-size:0.875rem;color:var(--text-3)">Feels like ${Math.round(c.feelsLike)}Â°C</div>
         </div>
       </div>
       <div class="ext-details">
@@ -1790,7 +1796,7 @@ function renderExternalWeatherCard(data, container) {
   lucide.createIcons();
 }
 
-// ── Topbar search dropdown ─────────────────────────────────
+// ââ Topbar search dropdown âââââââââââââââââââââââââââââââââ
 function renderTopbarSearchDropdown(results) {
   const dd = $('topbar-search-dropdown');
   if (!dd) return;
@@ -1823,7 +1829,7 @@ function renderTopbarSearchDropdown(results) {
   lucide.createIcons();
 }
 
-// ── Saved locations ────────────────────────────────────────
+// ââ Saved locations ââââââââââââââââââââââââââââââââââââââââ
 function loadSavedLocations() {
   try {
     const stored = localStorage.getItem('wiq-saved');
@@ -1866,7 +1872,7 @@ function renderSavedLocations() {
   if (state.savedLocations.length === 0) {
     list.innerHTML = `
       <div class="saved-empty">
-        <div class="empty-icon">📍</div>
+        <div class="empty-icon">ð</div>
         <p>No saved locations yet.<br>Search for a city and save it here.</p>
       </div>`;
     return;
@@ -1875,14 +1881,14 @@ function renderSavedLocations() {
   list.innerHTML = state.savedLocations.map(loc => `
     <div class="saved-card" role="listitem" data-loc='${JSON.stringify(loc)}'>
       <div class="saved-info">
-        <span class="saved-icon-wrap" aria-hidden="true">📍</span>
+        <span class="saved-icon-wrap" aria-hidden="true">ð</span>
         <div>
           <div class="saved-city">${loc.city}</div>
           <div class="saved-state">${loc.state}, ${loc.country}</div>
         </div>
       </div>
       <div class="saved-weather">
-        <span class="saved-temp">${loc.temp}°C</span>
+        <span class="saved-temp">${loc.temp}Â°C</span>
         <span aria-hidden="true">${getWeatherIcon(loc.condition)}</span>
         <button class="saved-remove" data-id="${loc.id}" aria-label="Remove ${loc.city} from saved locations">
           <i data-lucide="trash-2"></i>
@@ -1909,7 +1915,7 @@ function renderSavedLocations() {
   lucide.createIcons();
 }
 
-// ── Settings page (extended with tabs) ────────────────────
+// ââ Settings page (extended with tabs) ââââââââââââââââââââ
 function renderSettings() {
   const container = $('settings-content');
   if (!container) return;
@@ -1920,11 +1926,11 @@ function renderSettings() {
   container.innerHTML = `
     <!-- Settings Tabs -->
     <div class="settings-tab-row">
-      <button class="settings-tab active" data-settings-tab="general">⚙️ General</button>
-      <button class="settings-tab" data-settings-tab="alerts">🔔 Alerts</button>
-      <button class="settings-tab" data-settings-tab="device">📡 Device</button>
-      <button class="settings-tab" data-settings-tab="demo">🎭 Demo</button>
-      <button class="settings-tab" data-settings-tab="about">ℹ️ About</button>
+      <button class="settings-tab active" data-settings-tab="general">âï¸ General</button>
+      <button class="settings-tab" data-settings-tab="alerts">ð Alerts</button>
+      <button class="settings-tab" data-settings-tab="device">ð¡ Device</button>
+      <button class="settings-tab" data-settings-tab="demo">ð­ Demo</button>
+      <button class="settings-tab" data-settings-tab="about">â¹ï¸ About</button>
     </div>
 
     <!-- Tab: General -->
@@ -1976,7 +1982,7 @@ function renderSettings() {
         <h3>Alert Preferences</h3>
         <div class="alert-pref-item">
           <div class="apref-left">
-            <div class="apref-icon">🌧️</div>
+            <div class="apref-icon">ð§ï¸</div>
             <div>
               <div class="apref-label">Rain Alerts</div>
               <div class="apref-desc">Threshold: <input class="threshold-input" id="thresh-rain" type="number" value="${notifSettings.thresholds?.rain || 60}" min="0" max="100">% probability</div>
@@ -1989,7 +1995,7 @@ function renderSettings() {
         </div>
         <div class="alert-pref-item">
           <div class="apref-left">
-            <div class="apref-icon">🫁</div>
+            <div class="apref-icon">ð«</div>
             <div>
               <div class="apref-label">Air Quality Alerts</div>
               <div class="apref-desc">Threshold: AQI > <input class="threshold-input" id="thresh-aqi" type="number" value="${notifSettings.thresholds?.aqi || 100}" min="0" max="500"></div>
@@ -2002,10 +2008,10 @@ function renderSettings() {
         </div>
         <div class="alert-pref-item">
           <div class="apref-left">
-            <div class="apref-icon">🌡️</div>
+            <div class="apref-icon">ð¡ï¸</div>
             <div>
               <div class="apref-label">High Temperature Alerts</div>
-              <div class="apref-desc">Alert when temperature exceeds <input class="threshold-input" id="thresh-temp" type="number" value="${notifSettings.thresholds?.temperatureHigh || 38}" min="20" max="60">°C</div>
+              <div class="apref-desc">Alert when temperature exceeds <input class="threshold-input" id="thresh-temp" type="number" value="${notifSettings.thresholds?.temperatureHigh || 38}" min="20" max="60">Â°C</div>
             </div>
           </div>
           <label class="toggle">
@@ -2015,7 +2021,7 @@ function renderSettings() {
         </div>
         <div class="alert-pref-item">
           <div class="apref-left">
-            <div class="apref-icon">☀️</div>
+            <div class="apref-icon">âï¸</div>
             <div>
               <div class="apref-label">UV Index Alerts</div>
               <div class="apref-desc">Alert when UV Index exceeds <input class="threshold-input" id="thresh-uv" type="number" value="${notifSettings.thresholds?.uv || 8}" min="0" max="11"></div>
@@ -2028,7 +2034,7 @@ function renderSettings() {
         </div>
         <div class="alert-pref-item">
           <div class="apref-left">
-            <div class="apref-icon">📡</div>
+            <div class="apref-icon">ð¡</div>
             <div>
               <div class="apref-label">IoT Device Offline Alert</div>
               <div class="apref-desc">Alert when IoT station goes offline</div>
@@ -2057,18 +2063,18 @@ function renderSettings() {
       <div class="settings-section">
         <h3>IoT Station</h3>
         <div class="device-info-card">
-          <div class="di-row"><span class="di-key">Device ID</span><span class="di-value">${iotData?.deviceId || '—'}</span></div>
-          <div class="di-row"><span class="di-key">Firmware</span><span class="di-value">${iotData?.firmwareVersion || '—'}</span></div>
-          <div class="di-row"><span class="di-key">Battery</span><span class="di-value">${iotData?.batteryLevel != null ? iotData.batteryLevel + '%' : '—'}</span></div>
-          <div class="di-row"><span class="di-key">Signal Strength</span><span class="di-value">${iotData?.signalStrength != null ? iotData.signalStrength + '%' : iotData?.signal || '—'}</span></div>
+          <div class="di-row"><span class="di-key">Device ID</span><span class="di-value">${iotData?.deviceId || 'â'}</span></div>
+          <div class="di-row"><span class="di-key">Firmware</span><span class="di-value">${iotData?.firmwareVersion || 'â'}</span></div>
+          <div class="di-row"><span class="di-key">Battery</span><span class="di-value">${iotData?.batteryLevel != null ? iotData.batteryLevel + '%' : 'â'}</span></div>
+          <div class="di-row"><span class="di-key">Signal Strength</span><span class="di-value">${iotData?.signalStrength != null ? iotData.signalStrength + '%' : iotData?.signal || 'â'}</span></div>
           <div class="di-row"><span class="di-key">Status</span>
-            <span class="di-value" style="color:var(--iot-color)">${iotData?.status || '—'}</span>
+            <span class="di-value" style="color:var(--iot-color)">${iotData?.status || 'â'}</span>
           </div>
           <div class="di-row"><span class="di-key">Last Update</span>
-            <span class="di-value">${iotData?.lastUpdate ? timeAgo(iotData.lastUpdate) : '—'}</span>
+            <span class="di-value">${iotData?.lastUpdate ? timeAgo(iotData.lastUpdate) : 'â'}</span>
           </div>
           <div class="di-row"><span class="di-key">Location</span>
-            <span class="di-value">${iotData?.location?.city || '—'}, ${iotData?.location?.state || '—'}</span>
+            <span class="di-value">${iotData?.location?.city || 'â'}, ${iotData?.location?.state || 'â'}</span>
           </div>
         </div>
       </div>
@@ -2077,7 +2083,7 @@ function renderSettings() {
     <!-- Tab: Demo Mode -->
     <div class="settings-panel" id="settings-panel-demo">
       <div class="settings-section">
-        <h3>🎭 Demo Mode</h3>
+        <h3>ð­ Demo Mode</h3>
         <p style="font-size:0.8125rem;color:var(--text-3);margin-bottom:16px">
           Demo mode lets you simulate specific weather events to preview how WeatherIQ responds. Data will be clearly labelled as DEMO.
         </p>
@@ -2095,10 +2101,10 @@ function renderSettings() {
           <div style="font-size:0.875rem;font-weight:600;margin-bottom:8px;color:var(--text-2)">Scenario</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px">
             ${[
-      { key: 'rain_event', label: '🌧️ Rain Event' },
-      { key: 'aqi_spike', label: '🫁 AQI Spike' },
-      { key: 'temp_spike', label: '🌡️ Heat Wave' },
-      { key: 'clear_night', label: '🌙 Clear Night' },
+      { key: 'rain_event', label: 'ð§ï¸ Rain Event' },
+      { key: 'aqi_spike', label: 'ð« AQI Spike' },
+      { key: 'temp_spike', label: 'ð¡ï¸ Heat Wave' },
+      { key: 'clear_night', label: 'ð Clear Night' },
     ].map(s => `
               <button class="trn-btn demo-scenario-btn ${state.demoScenario === s.key ? 'active' : ''}"
                       data-scenario="${s.key}">${s.label}</button>
@@ -2115,8 +2121,8 @@ function renderSettings() {
         <div class="device-info-card">
           <div class="di-row"><span class="di-key">Application</span><span class="di-value">WeatherIQ</span></div>
           <div class="di-row"><span class="di-key">Version</span><span class="di-value">2.0.0</span></div>
-          <div class="di-row"><span class="di-key">AI Model</span><span class="di-value">${state.aiPrediction?.modelVersion || '—'}</span></div>
-          <div class="di-row"><span class="di-key">Training Data</span><span class="di-value">${state.aiPrediction?.dataPoints?.toLocaleString() || '—'} points</span></div>
+          <div class="di-row"><span class="di-key">AI Model</span><span class="di-value">${state.aiPrediction?.modelVersion || 'â'}</span></div>
+          <div class="di-row"><span class="di-key">Training Data</span><span class="di-value">${state.aiPrediction?.dataPoints?.toLocaleString() || 'â'} points</span></div>
           <div class="di-row"><span class="di-key">Features</span><span class="di-value">IoT Sensors, AI Prediction, Anomaly Detection, Smart Alerts, PWA</span></div>
         </div>
       </div>
@@ -2156,7 +2162,7 @@ function renderSettings() {
   if (pushBtn && window.NotificationsManager) {
     pushBtn.addEventListener('click', async () => {
       const granted = await NotificationsManager.requestBrowserPermission();
-      pushBtn.textContent = granted ? '✅ Enabled' : '❌ Blocked';
+      pushBtn.textContent = granted ? 'â Enabled' : 'â Blocked';
     });
   }
 
@@ -2172,7 +2178,7 @@ function renderSettings() {
   });
 }
 
-// ── Demo Mode ──────────────────────────────────────────────
+// ââ Demo Mode ââââââââââââââââââââââââââââââââââââââââââââââ
 function toggleDemoMode(enabled) {
   state.demoMode = enabled;
   const banner = $('demo-banner');
@@ -2212,7 +2218,7 @@ function applyDemoScenario() {
   }
 }
 
-// ── Notifications ──────────────────────────────────────────
+// ââ Notifications ââââââââââââââââââââââââââââââââââââââââââ
 function setupNotifications() {
   if (!window.NotificationsManager) return;
 
@@ -2245,7 +2251,7 @@ function renderNotificationList(notifications) {
   if (filtered.length === 0) {
     list.innerHTML = `
       <div class="notif-empty">
-        <div class="notif-empty-icon">🔔</div>
+        <div class="notif-empty-icon">ð</div>
         <p>No ${filter === 'all' ? '' : filter + ' '}notifications</p>
       </div>`;
     return;
@@ -2275,7 +2281,7 @@ function toggleNotifPanel() {
   if (panel) panel.classList.toggle('open', state.notifPanelOpen);
 }
 
-// ── AI Assistant ───────────────────────────────────────────
+// ââ AI Assistant âââââââââââââââââââââââââââââââââââââââââââ
 function setupAssistant() {
   const fab = $('assistant-fab');
   const panel = $('assistant-panel');
@@ -2301,7 +2307,7 @@ function setupAssistant() {
     if (!query) return;
     input.value = '';
     appendAssistantMessage(query, 'user');
-    appendAssistantMessage('Thinking…', 'bot typing');
+    appendAssistantMessage('Thinkingâ¦', 'bot typing');
 
     try {
       const response = await API.askAssistant(query, state.iotData, state.aiPrediction);
@@ -2370,7 +2376,7 @@ function removeTypingMessage() {
   if (typing) typing.remove();
 }
 
-// ── PWA Setup ──────────────────────────────────────────────
+// ââ PWA Setup ââââââââââââââââââââââââââââââââââââââââââââââ
 function setupPWA() {
   if (!window.PWAManager) return;
   PWAManager.init();
@@ -2402,7 +2408,7 @@ function setupPWA() {
   });
 }
 
-// ── Export wiring ──────────────────────────────────────────
+// ââ Export wiring ââââââââââââââââââââââââââââââââââââââââââ
 function setupExport() {
   if (!window.DataExporter) return;
 
@@ -2426,7 +2432,7 @@ function setupExport() {
   });
 }
 
-// ── Helper states ──────────────────────────────────────────
+// ââ Helper states ââââââââââââââââââââââââââââââââââââââââââ
 function renderSkeletonState(message) {
   return `<div class="state-card"><div class="spinner"></div><div class="state-msg">${message}</div></div>`;
 }
@@ -2437,7 +2443,7 @@ function renderLoadingGrid(count) {
   ).join('');
 }
 
-// ── IoT polling ────────────────────────────────────────────
+// ââ IoT polling ââââââââââââââââââââââââââââââââââââââââââââ
 function setupPolling() {
   // Update relative time every 5 seconds
   setInterval(() => {
@@ -2467,7 +2473,7 @@ function setupPolling() {
   }, 5_000);
 }
 
-// ── Event listeners ────────────────────────────────────────
+// ââ Event listeners ââââââââââââââââââââââââââââââââââââââââ
 function setupEventListeners() {
   // Sidebar nav items
   $$('.nav-item[data-page]').forEach(item => {
@@ -2683,7 +2689,7 @@ function closeSidebarOnMobile() {
   if (toggle) toggle.setAttribute('aria-expanded', 'false');
 }
 
-// ── Data loading ───────────────────────────────────────────
+// ââ Data loading âââââââââââââââââââââââââââââââââââââââââââ
 async function loadIoTData() {
   try {
     const data = await API.getIoTData();
@@ -2717,7 +2723,7 @@ async function loadAIPrediction() {
   }
 }
 
-// ── Initialise ─────────────────────────────────────────────
+// ââ Initialise âââââââââââââââââââââââââââââââââââââââââââââ
 async function init() {
   // Apply saved theme immediately
   applyTheme(state.theme);
@@ -2755,7 +2761,7 @@ async function init() {
   if (window.lucide) lucide.createIcons();
 }
 
-// ── Boot ───────────────────────────────────────────────────
+// ââ Boot âââââââââââââââââââââââââââââââââââââââââââââââââââ
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
@@ -2797,11 +2803,11 @@ window.runTemporaryPrediction = function() {
       <p style="color: var(--text-2); font-size: 0.95rem; line-height: 1.5; margin-bottom: 24px;">
         ${predDesc}
         <br><br>
-        <small style="color: var(--text-3); display: block;">Generated live from IoT Sensor: T:${current.temperature}°C, H:${current.humidity}%, P:${current.pressure}hPa</small>
+        <small style="color: var(--text-3); display: block;">Generated live from IoT Sensor: T:${current.temperature}Â°C, H:${current.humidity}%, P:${current.pressure}hPa</small>
       </p>
       <div style="display: flex; gap: 8px; justify-content: center;">
-        <span class="badge badge-iot" style="font-size: 0.7rem; background: rgba(144, 202, 249, 0.15); color: #90CAF9;">⚡ LIVE IoT DATA</span>
-        <span class="badge badge-ai" style="font-size: 0.7rem; background: rgba(16, 185, 129, 0.15); color: #10B981;">✨ AI ANALYSIS</span>
+        <span class="badge badge-iot" style="font-size: 0.7rem; background: rgba(144, 202, 249, 0.15); color: #90CAF9;">â¡ LIVE IoT DATA</span>
+        <span class="badge badge-ai" style="font-size: 0.7rem; background: rgba(16, 185, 129, 0.15); color: #10B981;">â¨ AI ANALYSIS</span>
       </div>
     </div>
   `;
@@ -2893,19 +2899,80 @@ window.showCelestialDetails = function() {
   if (window.lucide) lucide.createIcons();
 };
 
+function loadCardBackgroundImage(card, imageUrl) {
+  if (!card) return;
+  // Add skeleton class and reset background to let skeleton show
+  card.classList.add('skeleton');
+  card.style.backgroundImage = 'none';
+
+  const img = new Image();
+  img.onload = () => {
+    card.style.backgroundImage = `url('${imageUrl}')`;
+    card.style.backgroundSize = 'cover';
+    card.style.backgroundPosition = 'center';
+    card.classList.remove('skeleton');
+    // We do not set card.style.animation = 'none' here so it doesn't override card hover animations if any, 
+    // unless it was specifically meant to override something. 
+    // If it was to stop an existing CSS animation, we might need to handle it, but the skeleton class handles the shimmer animation.
+  };
+  img.onerror = () => {
+    // In case image fails to load, remove skeleton so it doesn't spin forever
+    card.classList.remove('skeleton');
+  };
+  img.src = imageUrl;
+}
+
 function updateWeatherCardAnimation(condition) {
   const card = document.getElementById('current-weather-card');
   if (card) {
     card.classList.remove('bg-sunset', 'bg-sky', 'bg-rain', 'bg-clear', 'bg-clouds', 'bg-fog');
     const cond = (condition || '').toLowerCase();
-    if (cond.includes('sun') || cond.includes('clear') || cond === 'partly_cloudy') {
-      card.classList.add('bg-clear');
-    } else if (cond.includes('rain') || cond.includes('drizzle') || cond.includes('thunder') || cond.includes('shower')) {
-      card.classList.add('bg-rain');
-    } else if (cond.includes('fog') || cond.includes('mist')) {
-      card.classList.add('bg-fog');
-    } else {
-      card.classList.add('bg-clouds');
-    }
+    
+    let img = 'cloudy.png';
+    if (cond.includes('sun') || cond.includes('clear') || cond === 'partly_cloudy') img = 'sunnny.png';
+    else if (cond.includes('rain') || cond.includes('drizzle') || cond.includes('thunder') || cond.includes('shower')) img = 'Rainy.png';
+    else if (cond.includes('fog') || cond.includes('mist')) img = 'Foggy.png';
+    else if (cond.includes('storm')) img = 'Stromy.png';
+    else if (cond.includes('snow')) img = 'Snnoye.png';
+    else if (cond.includes('wind')) img = 'Windy.png';
+
+    loadCardBackgroundImage(card, `images/Tommorow prediction/${img}`);
+  }
+}
+
+function updateAqiCardImage(aqi) {
+  const card = document.getElementById('aqi-card');
+  if (card) {
+    let img = 'Under 50 aqi.png';
+    if (aqi > 300) img = '300+Aqi.png';
+    else if (aqi >= 200) img = 'Between 200-300 Aqi.png';
+    else if (aqi >= 150) img = 'Between 150-200 aqi.png';
+    else if (aqi >= 100) img = 'Between 100-150 aqi.png';
+    else if (aqi >= 50) img = 'between 50-100 aqi.png';
+
+    loadCardBackgroundImage(card, `images/Aqi Condition/${img}`);
+  }
+}
+
+function updateTomorrowCard(forecastItem) {
+  const card = document.getElementById('tomorrow-card');
+  if (card && forecastItem) {
+    card.classList.remove('bg-sunset', 'bg-sky', 'bg-rain', 'bg-clear', 'bg-clouds', 'bg-fog');
+    const cond = (forecastItem.condition || '').toLowerCase();
+    
+    let img = 'cloudy.png';
+    if (cond.includes('sun') || cond.includes('clear') || cond === 'partly_cloudy') img = 'sunnny.png';
+    else if (cond.includes('rain') || cond.includes('drizzle') || cond.includes('thunder') || cond.includes('shower')) img = 'Rainy.png';
+    else if (cond.includes('fog') || cond.includes('mist')) img = 'Foggy.png';
+    else if (cond.includes('storm')) img = 'Stromy.png';
+    else if (cond.includes('snow')) img = 'Snnoye.png';
+    else if (cond.includes('wind')) img = 'Windy.png';
+
+    loadCardBackgroundImage(card, `images/Tommorow prediction/${img}`);
+    
+    const tempEl = card.querySelector('.wh-temp');
+    if (tempEl) tempEl.textContent = `${Math.round(forecastItem.tempHigh || forecastItem.high)}°C`;
+    const condEl = card.querySelector('.wh-condition');
+    if (condEl) condEl.textContent = forecastItem.condition;
   }
 }
