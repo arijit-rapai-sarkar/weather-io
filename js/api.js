@@ -224,8 +224,18 @@ const API = (() => {
    * @param {object} current — IoT current readings
    */
   async function getWeatherScore(current) {
+    try {
+      const res = await fetch('http://localhost:8000/api/analytics/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(current || {})
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch(e) { console.warn("Backend /analytics/score failed, using mock", e); }
+
     await delay(MOCK_DELAY.fast);
-    // return apiFetch(ENDPOINTS.weatherScore, { method:'POST', body: JSON.stringify(current) });
     return MockData.getWeatherScore(current);
   }
 
@@ -233,8 +243,14 @@ const API = (() => {
    * Get IoT device health status.
    */
   async function getDeviceHealth(status) {
+    try {
+      const res = await fetch('http://localhost:8000/api/iot/health');
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch(e) { console.warn("Backend /iot/health failed, using mock", e); }
+
     await delay(MOCK_DELAY.fast);
-    // return apiFetch(ENDPOINTS.deviceHealth);
     return MockData.getDeviceHealth(status);
   }
 
@@ -244,8 +260,18 @@ const API = (() => {
    * @param {object} current
    */
   async function getAnomalies(history, current) {
+    try {
+      const res = await fetch('http://localhost:8000/api/analytics/anomalies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history: history || [], current: current || {} })
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch(e) { console.warn("Backend /analytics/anomalies failed, using mock", e); }
+
     await delay(MOCK_DELAY.fast);
-    // return apiFetch(ENDPOINTS.anomalies, { method:'POST', body: JSON.stringify({ history, current }) });
     return MockData.getAnomalies(history, current);
   }
 
