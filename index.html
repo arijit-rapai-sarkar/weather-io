@@ -260,15 +260,15 @@
                 <div class="card-header-flex">
                   <h3>How's the<br>temperature today?</h3>
                   <div class="chart-filters">
-                    <button class="icon-btn active" data-metric="temperature" onclick="setChartMetric('temperature')"
-                      style="background:var(--accent);color:white;cursor:pointer;border:none;"><i
-                        data-lucide="thermometer"></i></button>
-                    <button class="icon-btn" data-metric="rain" onclick="setChartMetric('rain')"
-                      style="cursor:pointer;border:none;background:var(--surface-2);"><i
-                        data-lucide="umbrella"></i></button>
-                    <button class="icon-btn" data-metric="wind" onclick="setChartMetric('wind')"
-                      style="cursor:pointer;border:none;background:var(--surface-2);"><i
-                        data-lucide="wind"></i></button>
+                    <button class="icon-btn active" data-metric="temperature" onclick="setChartMetric('temperature')" title="Temperature">
+                      <i data-lucide="thermometer"></i>
+                    </button>
+                    <button class="icon-btn" data-metric="rain" onclick="setChartMetric('rain')" title="Rainfall">
+                      <i data-lucide="umbrella"></i>
+                    </button>
+                    <button class="icon-btn" data-metric="wind" onclick="setChartMetric('wind')" title="Wind Speed">
+                      <i data-lucide="wind"></i>
+                    </button>
                   </div>
                 </div>
                 <div class="chart-mockup" id="main-temp-chart-container" style="margin-top:20px;height:140px;">

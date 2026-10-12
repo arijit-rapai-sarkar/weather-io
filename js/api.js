@@ -95,13 +95,24 @@ const API = (() => {
            mock.summary = `AI predicts max temp: ${realData.predicted_max_temp}°C. Rain tomorrow: ${realData.rain_tomorrow ? 'Yes' : 'No'}.`;
            mock.hourly[0].temperature = realData.predicted_max_temp;
            mock.hourly[0].rainProbability = realData.rain_tomorrow ? 80 : 10;
+           mock.tomorrow = {
+             tempHigh: realData.predicted_max_temp,
+             condition: realData.rain_tomorrow ? 'Rainy' : 'Sunny',
+             rainProbability: realData.rain_tomorrow ? 80 : 10
+           };
         }
         return mock;
       }
     } catch(e) { console.warn("Backend /weather/predict failed, using mock", e); }
 
     await delay(MOCK_DELAY.ai);
-    return MockData.getAIPrediction();
+    const mock = MockData.getAIPrediction();
+    mock.tomorrow = {
+      tempHigh: mock.daily?.[1]?.high || 24,
+      condition: mock.daily?.[1]?.condition || 'Partly Cloudy',
+      rainProbability: mock.daily?.[1]?.rainProbability || 20
+    };
+    return mock;
   }
 
   /**

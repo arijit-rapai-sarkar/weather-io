@@ -1943,8 +1943,38 @@ p  { font-size: 0.875rem; color: var(--text-2); }
 /* Temp Chart Card */
 .temp-chart-card { display: flex; flex-direction: column; background: var(--surface); }
 .card-header-flex { display: flex; justify-content: space-between; align-items: flex-start; }
-.chart-filters { display: flex; gap: 8px; background: var(--surface-2); padding: 4px; border-radius: 99px; }
-.chart-filters .icon-btn { width: 32px; height: 32px; border-radius: 50%; }
+.chart-filters {
+  display: flex;
+  gap: 6px;
+  background: var(--surface-2);
+  padding: 4px;
+  border-radius: 99px;
+  border: 1px solid var(--border-2);
+}
+.chart-filters .icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.chart-filters .icon-btn:hover {
+  background: var(--surface-3);
+  color: var(--text-1);
+  transform: scale(1.05);
+}
+.chart-filters .icon-btn.active {
+  background: var(--accent) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(255, 138, 0, 0.35);
+  transform: scale(1.05);
+}
 
 @media (max-width: 1200px) {
   .dashboard-layout { grid-template-columns: 1fr; }
