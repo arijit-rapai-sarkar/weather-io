@@ -3,12 +3,13 @@
 // Caches app shell and provides offline fallback.
 // ============================================================
 
-const CACHE_NAME    = 'weatheriq-v2.0';
+const CACHE_NAME    = 'weatheriq-v2.2';
 const SHELL_ASSETS  = [
   './',
   './index.html',
   './css/style.css',
   './css/animations.css',
+  './js/lucide.js',
   './js/mock-data.js',
   './js/charts.js',
   './js/api.js',

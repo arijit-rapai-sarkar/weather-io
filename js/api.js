@@ -70,10 +70,42 @@ const API = (() => {
         const mock = MockData.getIoTData();
         mock.current.temperature = realData.temperature;
         mock.current.humidity = realData.humidity;
-        mock.current.pressure = realData.pressure;
-        mock.current.aqi = realData.air_quality;
-        mock.current.aqiInfo = window.aqiCategory(realData.air_quality);
+        mock.current.pressure = realData.pressure != null ? realData.pressure : 1013.25;
+        mock.current.aqi = Math.round(realData.air_quality || 50);
+        mock.current.aqiInfo = window.aqiCategory ? window.aqiCategory(mock.current.aqi) : { label: 'Moderate' };
+        mock.current.sunlight = realData.sunlight || 'Dark';
+        mock.current.rainStatus = realData.rain || 'No Rain';
+        mock.current.rain = (realData.rain === 'Raining');
+        mock.current.rainfallMm = mock.current.rain ? 2.5 : 0.0;
         mock.lastUpdate = realData.timestamp;
+
+        // Calculate realistic feels-like temperature
+        const T = realData.temperature || 25;
+        const H = realData.humidity || 50;
+        const e = (H / 100) * 6.105 * Math.exp((17.27 * T) / (237.7 + T));
+        mock.current.feelsLike = Math.round((T + 0.33 * e - 4.0) * 10) / 10;
+
+        // Set realistic weather condition based on IoT hardware sensors
+        if (realData.rain === 'Raining') {
+          mock.current.condition = 'rainy';
+        } else if (realData.sunlight === 'Bright') {
+          mock.current.condition = 'sunny';
+        } else {
+          const hr = new Date(realData.timestamp || Date.now()).getHours();
+          mock.current.condition = (hr >= 18 || hr < 6) ? 'clear' : 'partly_cloudy';
+        }
+
+        // Set UV based on sunlight & time of day
+        const hr = new Date(realData.timestamp || Date.now()).getHours();
+        if (realData.sunlight === 'Bright' && hr >= 10 && hr <= 16) {
+          mock.current.uvIndex = 6;
+        } else if (realData.sunlight === 'Bright') {
+          mock.current.uvIndex = 3;
+        } else {
+          mock.current.uvIndex = 0;
+        }
+        if (window.uvCategory) mock.current.uvInfo = window.uvCategory(mock.current.uvIndex);
+
         return mock;
       }
     } catch(e) { console.warn("Backend /weather/current failed, using mock", e); }

@@ -56,17 +56,20 @@ const SENSORS = [
 
 // Source badge helpers
 
-// ── Performance: Debounced Lucide icon updater ─────────────
+// ── Lucide icon updater ────────────────────────────────────
 let iconRenderScheduled = false;
 function refreshIcons(root = null) {
   if (typeof window === 'undefined' || !window.lucide) return;
   if (root) {
-    try { lucide.createIcons({ root }); return; } catch (e) {}
+    try { lucide.createIcons({ root }); } catch (e) {}
+    return;
   }
   if (!iconRenderScheduled) {
     iconRenderScheduled = true;
     requestAnimationFrame(() => {
-      if (window.lucide) refreshIcons();
+      try {
+        if (window.lucide) lucide.createIcons();
+      } catch (e) {}
       iconRenderScheduled = false;
     });
   }
@@ -290,6 +293,52 @@ function renderCurrentWeather(data) {
         <div class="cs-label">${it.label}</div>
         <div class="cs-source">${it.source}</div>
       </div>`).join('');
+  }
+
+  // Dynamic update for AQI card
+  const aqiCard = $('aqi-card');
+  if (aqiCard) {
+    const aqiVal = $('aqi-val') || aqiCard.querySelector('.wh-temp');
+    if (aqiVal) aqiVal.textContent = Math.round(c.aqi);
+
+    const aqiLabel = $('aqi-label') || aqiCard.querySelector('.wh-condition');
+    const aqiInfo = c.aqiInfo || (window.aqiCategory ? window.aqiCategory(c.aqi) : { label: 'Moderate' });
+    if (aqiLabel) aqiLabel.textContent = aqiInfo.label;
+
+    const fill = $('aqi-bar-fill') || aqiCard.querySelector('.aqi-bar-fill');
+    const thumb = $('aqi-bar-thumb') || aqiCard.querySelector('.aqi-bar-thumb');
+    const pct = Math.min(100, Math.max(10, Math.round((c.aqi / 300) * 100)));
+    if (fill) fill.style.width = `${pct}%`;
+    if (thumb) {
+      thumb.style.left = `${pct}%`;
+      thumb.textContent = aqiInfo.label;
+    }
+  }
+
+  // Dynamic update for hardware Rain and Sunlight sensor chips
+  const rainEl = $('cw-rain');
+  if (rainEl) {
+    rainEl.textContent = c.rainStatus || (c.rain ? 'Raining' : 'No Rain');
+    rainEl.style.color = c.rain ? '#38BDF8' : '';
+  }
+  const sunEl = $('cw-sunlight');
+  if (sunEl) {
+    sunEl.textContent = c.sunlight || 'Dark';
+    sunEl.style.color = (c.sunlight === 'Bright') ? '#FBBF24' : '';
+  }
+
+  // Dynamic update for UVI card
+  const uviVal = $('uvi-val');
+  if (uviVal) uviVal.textContent = `${c.uvIndex || 0} UVI`;
+  const uviBadge = $('uvi-badge');
+  if (uviBadge) {
+    const uvInfo = c.uvInfo || (window.uvCategory ? window.uvCategory(c.uvIndex || 0) : { label: 'Low', color: '#10B981' });
+    uviBadge.textContent = uvInfo.label || 'Low';
+    if (uvInfo.color) uviBadge.style.background = uvInfo.color;
+  }
+  const uviDesc = $('uvi-desc');
+  if (uviDesc) {
+    uviDesc.textContent = (c.uvIndex <= 2) ? 'Low risk from UV rays' : (c.uvIndex <= 5 ? 'Moderate risk from UV rays' : 'High UV exposure — wear sunscreen');
   }
 
   renderIoTStatus(data);
@@ -565,6 +614,20 @@ function renderAIPredictionCard(data) {
       </div>
     </div>
   `).join('');
+
+  const predList = $('prediction-list');
+  if (predList && data.daily) {
+    predList.innerHTML = data.daily.slice(0, 3).map(d => `
+      <div class="prediction-item card">
+        <i data-lucide="${(d.condition || '').includes('rain') ? 'cloud-rain' : ((d.condition || '').includes('sun') || d.condition === 'clear' ? 'sun' : 'cloud')}" style="color:var(--accent);width:32px;height:32px"></i>
+        <div style="flex:1;">
+          <div style="font-size:0.75rem;color:var(--text-3)">${d.day || d.date}</div>
+          <div style="font-weight:600">${getWeatherLabel(d.condition)}</div>
+        </div>
+        <div style="font-weight:600;color:var(--accent)">${d.high}° <span style="color:var(--text-3)">/ ${d.low}°</span></div>
+      </div>
+    `).join('');
+  }
 
   refreshIcons();
 }
