@@ -322,8 +322,14 @@ const API = (() => {
    * Get AI model performance metrics.
    */
   async function getModelPerformance() {
+    try {
+      const res = await fetch('http://localhost:8000/api/ai/performance');
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch(e) { console.warn("Backend /ai/performance failed, using mock", e); }
+
     await delay(MOCK_DELAY.medium);
-    // return apiFetch(ENDPOINTS.modelPerformance);
     return MockData.getModelPerformance();
   }
 
@@ -331,8 +337,18 @@ const API = (() => {
    * Get AI vs Actual comparison data.
    */
   async function getAIVsActual(hourly, history) {
+    try {
+      const res = await fetch('http://localhost:8000/api/ai/validation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch(e) { console.warn("Backend /ai/validation failed, using mock", e); }
+
     await delay(MOCK_DELAY.medium);
-    // return apiFetch(ENDPOINTS.aiVsActual);
     return MockData.getAIVsActual(hourly, history);
   }
 
@@ -368,8 +384,14 @@ const API = (() => {
    * Get notification history.
    */
   async function getNotifications() {
+    try {
+      const res = await fetch('http://localhost:8000/api/notifications');
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch(e) { console.warn("Backend /notifications failed, using mock", e); }
+
     await delay(MOCK_DELAY.fast);
-    // return apiFetch(ENDPOINTS.notifications);
     return MockData.getNotifications();
   }
 
@@ -377,9 +399,26 @@ const API = (() => {
    * Get system analytics.
    */
   async function getSystemAnalytics() {
+    try {
+      const res = await fetch('http://localhost:8000/api/analytics/system');
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch(e) { console.warn("Backend /analytics/system failed, using mock", e); }
+
     await delay(MOCK_DELAY.fast);
-    // return apiFetch(ENDPOINTS.analytics);
     return MockData.getSystemAnalytics();
+  }
+
+  /**
+   * Check active AI assistant backend mode (LLM vs local NLU+ML).
+   */
+  async function getAssistantStatus() {
+    try {
+      const res = await fetch('http://localhost:8000/api/ai/assistant/status');
+      if (res.ok) return await res.json();
+    } catch (e) { /* ignore when backend offline */ }
+    return { mode: 'offline', label: 'Offline Fallback' };
   }
 
   /**
@@ -387,10 +426,30 @@ const API = (() => {
    * @param {string} query
    * @param {object} iotData
    * @param {object} aiPrediction
+   * @param {object} extraContext — optional { history, externalWeather, llmConfig }
    */
-  async function askAssistant(query, iotData, aiPrediction) {
-    await delay(800); // Simulate AI thinking
-    // return apiFetch(ENDPOINTS.assistant, { method:'POST', body: JSON.stringify({ query, context: { iotData, aiPrediction } }) });
+  async function askAssistant(query, iotData, aiPrediction, extraContext = {}) {
+    try {
+      const res = await fetch('http://localhost:8000/api/ai/assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query,
+          history: extraContext.history || [],
+          context: {
+            iotData,
+            aiPrediction,
+            externalWeather: extraContext.externalWeather || null,
+          },
+          llmConfig: extraContext.llmConfig || null,
+        })
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch(e) { console.warn("Backend /ai/assistant failed, using mock", e); }
+
+    await delay(500);
     return MockData.askAssistant(query, iotData, aiPrediction);
   }
 
@@ -398,6 +457,17 @@ const API = (() => {
    * Get AI prediction explanation.
    */
   async function getAIPredictionExplanation(prediction, current) {
+    try {
+      const res = await fetch('http://localhost:8000/api/ai/explanation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prediction, current })
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch(e) { console.warn("Backend /ai/explanation failed, using mock", e); }
+
     await delay(MOCK_DELAY.fast);
     return MockData.getAIPredictionExplanation(prediction, current);
   }
@@ -414,7 +484,7 @@ const API = (() => {
     getIoTData, getAIPrediction, getExternalWeather, searchLocations,
     getWeatherScore, getDeviceHealth, getAnomalies, getModelPerformance,
     getAIVsActual, getHistoricalData, getNotifications, getSystemAnalytics,
-    askAssistant, getAIPredictionExplanation, getLocalVsExternal,
+    askAssistant, getAssistantStatus, getAIPredictionExplanation, getLocalVsExternal,
     ENDPOINTS,
   };
 })();

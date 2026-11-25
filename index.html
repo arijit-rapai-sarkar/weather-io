@@ -14,8 +14,10 @@
   <meta property="og:description" content="Local weather intelligence with real-time IoT sensors and AI predictions." />
   <title>WeatherIQ — AI + IoT Weather Intelligence Platform</title>
 
-  <!-- PWA Manifest -->
+  <!-- PWA Manifest & Icons -->
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" sizes="192x192" href="images/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="images/icons/icon-192.png" />
 
   <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -25,8 +27,8 @@
     rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=2.3" />
-  <link rel="stylesheet" href="css/animations.css?v=2.3" />
+  <link rel="stylesheet" href="css/style.css?v=2.6" />
+  <link rel="stylesheet" href="css/animations.css?v=2.6" />
 </head>
 
 <body>
@@ -275,10 +277,10 @@
                     </button>
                   </div>
                 </div>
-                <div class="chart-mockup" id="main-temp-chart-container" style="margin-top:20px;height:140px;">
-                  <!-- A simple SVG or placeholder for the spline chart -->
+                <div class="chart-mockup" id="main-temp-chart-container" style="margin-top:16px;min-height:150px;">
+                  <!-- Spline chart rendered via Charts.areaChart -->
                   <div class="skeleton skel-block"
-                    style="height:120px;width:100%;background:var(--surface-3);border-radius:12px;"></div>
+                    style="height:150px;width:100%;background:var(--surface-3);border-radius:12px;"></div>
                 </div>
               </div>
 
@@ -446,15 +448,17 @@
             </div>
 
             <!-- UVI Card -->
-            <div class="card uvi-card dark-card">
-              <div style="display:flex;align-items:center;gap:12px;">
-                <i data-lucide="sun" style="color:var(--accent)"></i>
-                <div>
-                  <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:1.25rem;font-weight:700;color:white;" id="uvi-val">0 UVI</span>
-                    <span class="badge" id="uvi-badge" style="background:#10B981;color:black;">Low</span>
+            <div class="card uvi-card" style="padding:18px;">
+              <div style="display:flex;align-items:center;gap:14px;">
+                <div class="uvi-icon-bubble" style="width:44px;height:44px;border-radius:12px;background:rgba(245,158,11,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                  <i data-lucide="sun" style="width:24px;height:24px;color:#F59E0B;"></i>
+                </div>
+                <div style="flex:1;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <span style="font-size:1.25rem;font-weight:700;" id="uvi-val">0 UVI</span>
+                    <span class="badge" id="uvi-badge" style="background:#10B981;color:white;font-weight:600;">Low</span>
                   </div>
-                  <div style="font-size:0.75rem;color:rgba(255,255,255,0.7);margin-top:4px;" id="uvi-desc">Low risk of UV exposure</div>
+                  <div style="font-size:0.75rem;color:var(--text-3);margin-top:3px;" id="uvi-desc">Low risk of UV exposure</div>
                 </div>
               </div>
             </div>
@@ -486,8 +490,8 @@
               </div>
 
               <button class="btn-primary" onclick="navigateTo('forecast')"
-                style="width:100%;margin-top:16px;border-radius:99px;padding:12px;background:var(--accent);color:white;font-weight:600;display:flex;justify-content:center;align-items:center;gap:8px;cursor:pointer;border:none;">
-                <i data-lucide="calendar"></i> Next 5 Days
+                style="width:100%;margin-top:16px;border-radius:99px;padding:12px;background:var(--accent);color:white;font-weight:600;display:flex;justify-content:center;align-items:center;gap:8px;cursor:pointer;border:none;box-shadow:var(--shadow-md);">
+                <i data-lucide="calendar" style="width:18px;height:18px;"></i> Next 5 Days
               </button>
             </div>
 
@@ -917,21 +921,21 @@
         <span class="assistant-header-icon">🤖</span>
         <div class="assistant-header-text">
           <h3>Ask WeatherIQ</h3>
-          <p>Powered by IoT + AI data</p>
+          <p id="assistant-engine-label">WeatherIQ NLU + ML • Live IoT</p>
         </div>
+        <button class="assistant-clear" id="assistant-clear" title="Clear conversation" aria-label="Clear conversation">↺</button>
         <button class="assistant-close" id="assistant-close" aria-label="Close assistant">✕</button>
       </div>
       <div class="assistant-messages" id="assistant-messages" role="log" aria-live="polite">
         <div class="assistant-msg bot">
-          Hi! I'm WeatherIQ. Ask me anything about your local weather conditions, forecasts, or what you should do
-          today. 🌦️
+          Hi! I'm WeatherIQ. Ask me anything about live sensor readings, ML rain/temp predictions, comfort scores, device health, or sensor anomalies. 🌦️
         </div>
       </div>
       <div class="assistant-suggestions" id="assistant-suggestions">
         <button class="suggestion-chip" data-query="Can I go running now?">🏃 Can I run?</button>
-        <button class="suggestion-chip" data-query="Will it rain today?">🌧️ Rain today?</button>
-        <button class="suggestion-chip" data-query="What is the air quality?">🫁 Air quality?</button>
-        <button class="suggestion-chip" data-query="What is the UV index?">☀️ UV index?</button>
+        <button class="suggestion-chip" data-query="Will it rain tomorrow and why?">🌧️ Rain & why?</button>
+        <button class="suggestion-chip" data-query="What is the Weather Comfort Score?">⭐ Comfort score</button>
+        <button class="suggestion-chip" data-query="Are my IoT sensors healthy?">📡 Device health</button>
       </div>
       <div class="assistant-input-row">
         <input type="text" class="assistant-input" id="assistant-input" placeholder="Ask about weather conditions…"
@@ -959,14 +963,14 @@
   <!-- ═══════════════════════════════════════════════════════════
      SCRIPTS
 ════════════════════════════════════════════════════════════════ -->
-  <script src="js/lucide.js?v=2.2"></script>
-  <script src="js/mock-data.js?v=2.2"></script>
-  <script src="js/charts.js?v=2.2"></script>
-  <script src="js/api.js?v=2.2"></script>
-  <script src="js/features/notifications.js?v=2.2"></script>
-  <script src="js/features/export.js?v=2.2"></script>
-  <script src="js/features/pwa.js?v=2.2"></script>
-  <script src="js/app.js?v=2.2"></script>
+  <script src="js/lucide.js?v=2.6"></script>
+  <script src="js/mock-data.js?v=2.6"></script>
+  <script src="js/charts.js?v=2.6"></script>
+  <script src="js/api.js?v=2.6"></script>
+  <script src="js/features/notifications.js?v=2.6"></script>
+  <script src="js/features/export.js?v=2.6"></script>
+  <script src="js/features/pwa.js?v=2.6"></script>
+  <script src="js/app.js?v=2.6"></script>
 
 </body>
 

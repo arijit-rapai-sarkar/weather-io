@@ -91,17 +91,17 @@ const Charts = (() => {
     fillFrom = '#3B82F6',
     unit     = '°C',
     w        = 460,
-    h        = 140,
-    showDots = false,
+    h        = 150,
+    showDots = true,
   } = {}) {
-    if (!values || values.length < 2) return '<p class="chart-empty">No data</p>';
+    if (!values || values.length < 2) return '<p class="chart-empty">No data available</p>';
 
-    const pad   = { t: 16, r: 16, b: 32, l: 36 };
-    const cw    = w - pad.l - pad.r;
-    const ch    = h - pad.t - pad.b;
+    const pad   = { t: 18, r: 20, b: 28, l: 42 };
+    const cw    = Math.max(10, w - pad.l - pad.r);
+    const ch    = Math.max(10, h - pad.t - pad.b);
     const lo    = Math.min(...values);
     const hi    = Math.max(...values);
-    const rng   = hi - lo || 1;
+    const rng   = (hi - lo === 0) ? 2 : (hi - lo);
 
     const pts = values.map((v, i) => ({
       x: pad.l + (i / (values.length - 1)) * cw,
@@ -112,61 +112,67 @@ const Charts = (() => {
     const linePath = smoothPath(pts);
     const last     = pts[pts.length - 1];
     const areaPath = `${linePath} L ${last.x} ${pad.t + ch} L ${pts[0].x} ${pad.t + ch} Z`;
+    const cleanId  = color.replace(/[^a-zA-Z0-9]/g, '');
 
-    // Y-axis labels
+    // Y-axis labels with rounded nice values
     const yTicks = [lo, (lo + hi) / 2, hi].map((v, i) => {
       const y = pad.t + (1 - (v - lo) / rng) * ch;
-      return `<text x="${pad.l - 6}" y="${y + 4}" text-anchor="end"
-                    font-size="10" fill="var(--text-3)">${Math.round(v)}${unit}</text>`;
+      return `<text x="${pad.l - 8}" y="${y + 4}" text-anchor="end"
+                    font-size="10" font-weight="600" fill="var(--text-3)">${Math.round(v)}${unit}</text>`;
     }).join('');
 
-    // X-axis labels (every 4th label)
+    // X-axis labels (spaced evenly)
+    const step = Math.max(1, Math.ceil(labels.length / 6));
     const xLabels = labels
       ? labels.map((lbl, i) => {
-          if (i % Math.ceil(labels.length / 6) !== 0) return '';
+          if (i % step !== 0 && i !== labels.length - 1) return '';
           const x = pad.l + (i / (labels.length - 1)) * cw;
-          return `<text x="${x}" y="${h - 4}" text-anchor="middle"
-                        font-size="10" fill="var(--text-3)">${lbl}</text>`;
+          return `<text x="${x}" y="${h - 6}" text-anchor="middle"
+                        font-size="10" font-weight="500" fill="var(--text-3)">${lbl}</text>`;
         }).join('')
       : '';
 
-    // Dots
-    const dots = showDots
-      ? pts.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3"
-                               fill="${color}" stroke="white" stroke-width="1.5"/>`).join('')
-      : `<circle cx="${last.x}" cy="${last.y}" r="4"
-                 fill="${color}" stroke="white" stroke-width="2"/>`;
-
-    // Tooltip-ready data points (invisible but hoverable)
-    const tooltipDots = pts.map((p, i) => `
-      <circle cx="${p.x}" cy="${p.y}" r="10" fill="transparent" class="chart-hover-dot"
-              data-val="${p.v}" data-label="${labels?.[i] || i}"/>
-    `).join('');
+    // Interactive Hover & Data Dots
+    const dots = pts.map((p, i) => {
+      const lbl = labels?.[i] || `${i}:00`;
+      const isPeak = p.v === hi;
+      return `<g class="chart-point-group" tabindex="0">
+        <title>${lbl} — ${p.v}${unit}</title>
+        <circle cx="${p.x}" cy="${p.y}" r="${isPeak ? 5 : 3.5}"
+                fill="${color}" stroke="#FFFFFF" stroke-width="2" class="chart-dot"/>
+        <circle cx="${p.x}" cy="${p.y}" r="12" fill="transparent" class="chart-hit-area"/>
+      </g>`;
+    }).join('');
 
     return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}"
-                 xmlns="http://www.w3.org/2000/svg" style="display:block" role="img"
+                 xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible;" role="img"
                  aria-label="Sensor history chart">
       <defs>
-        <linearGradient id="chartGrad-${color.replace('#','')}" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="${fillFrom}" stop-opacity="0.25"/>
-          <stop offset="100%" stop-color="${fillFrom}" stop-opacity="0.02"/>
+        <linearGradient id="chartGrad-${cleanId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stop-color="${fillFrom}" stop-opacity="0.38"/>
+          <stop offset="60%"  stop-color="${fillFrom}" stop-opacity="0.10"/>
+          <stop offset="100%" stop-color="${fillFrom}" stop-opacity="0.00"/>
         </linearGradient>
+        <filter id="glow-${cleanId}" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="${color}" flood-opacity="0.45"/>
+        </filter>
       </defs>
-      <!-- Grid lines -->
+      <!-- Horizontal subtle grid lines -->
       ${[0, 0.5, 1].map(t => {
         const gy = pad.t + t * ch;
         return `<line x1="${pad.l}" y1="${gy}" x2="${pad.l + cw}" y2="${gy}"
-                      stroke="var(--border)" stroke-width="1" stroke-dasharray="4,4"/>`;
+                      stroke="currentColor" stroke-opacity="0.09" stroke-width="1" stroke-dasharray="3,4"/>`;
       }).join('')}
-      <!-- Area fill -->
-      <path d="${areaPath}" fill="url(#chartGrad-${color.replace('#','')})"/>
-      <!-- Line -->
+      <!-- Area fill with soft gradient -->
+      <path d="${areaPath}" fill="url(#chartGrad-${cleanId})"/>
+      <!-- Glowing curve line -->
       <path d="${linePath}" fill="none" stroke="${color}"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <!-- Axis labels -->
+            stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+            filter="url(#glow-${cleanId})"/>
+      <!-- Axis text -->
       ${yTicks}
       ${xLabels}
-      <!-- Dots -->
+      <!-- Data dots with hover titles -->
       ${dots}
     </svg>`;
   }

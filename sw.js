@@ -3,8 +3,8 @@
 // Caches app shell and provides offline fallback.
 // ============================================================
 
-const CACHE_NAME    = 'weatheriq-v2.2';
-const SHELL_ASSETS  = [
+const CACHE_NAME   = 'weatheriq-v2.6';
+const SHELL_ASSETS = [
   './',
   './index.html',
   './css/style.css',
@@ -17,6 +17,9 @@ const SHELL_ASSETS  = [
   './js/features/notifications.js',
   './js/features/export.js',
   './js/features/pwa.js',
+  './images/icons/icon-192.png',
+  './images/icons/icon-512.png',
+  './images/icons/icon-maskable-512.png',
   './manifest.json',
 ];
 
@@ -47,21 +50,34 @@ self.addEventListener('activate', event => {
 
 // ── Fetch: network-first with cache fallback ──────────────────
 self.addEventListener('fetch', event => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
-  // Skip API calls — always network only (don't cache live data)
-  if (event.request.url.includes('localhost:8000') ||
-      event.request.url.includes('api.openweather') ||
-      event.request.url.includes('fonts.googleapis') ||
-      event.request.url.includes('unpkg.com')) {
+  let url;
+  try {
+    url = new URL(event.request.url);
+  } catch {
+    return;
+  }
+
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+
+  // Skip /api/ routes and third-party APIs/CDNs — always network only (never cache live telemetry)
+  if (
+    url.pathname === '/api' ||
+    url.pathname.startsWith('/api/') ||
+    url.pathname.includes('/api/') ||
+    url.hostname.includes('open-meteo.com') ||
+    url.hostname.includes('openweather') ||
+    url.hostname.includes('fonts.googleapis.com') ||
+    url.hostname.includes('fonts.gstatic.com') ||
+    url.hostname.includes('unpkg.com')
+  ) {
     return;
   }
 
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Cache successful responses
         if (response.ok) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
@@ -69,10 +85,8 @@ self.addEventListener('fetch', event => {
         return response;
       })
       .catch(() => {
-        // Offline: serve from cache
-        return caches.match(event.request).then(cached => {
+        return caches.match(event.request, { ignoreSearch: true }).then(cached => {
           if (cached) return cached;
-          // Last resort: serve index.html for navigation requests
           if (event.request.mode === 'navigate') {
             return caches.match('./index.html');
           }
@@ -85,7 +99,6 @@ self.addEventListener('fetch', event => {
 // ── Background sync (placeholder for future) ─────────────────
 self.addEventListener('sync', event => {
   if (event.tag === 'sync-sensor-data') {
-    // Future: sync buffered readings when back online
     console.log('[SW] Background sync triggered');
   }
 });

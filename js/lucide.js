@@ -62,7 +62,10 @@
       svg.setAttribute('stroke-width', '2');
       svg.setAttribute('stroke-linecap', 'round');
       svg.setAttribute('stroke-linejoin', 'round');
-      svg.setAttribute('class', 'lucide lucide-' + iconName + ' ' + (el.getAttribute('class') || ''));
+      var extraClasses = (el.getAttribute('class') || '')
+        .split(/\s+/)
+        .filter(function (cls) { return cls && cls !== 'lucide' && cls.indexOf('lucide-') !== 0; });
+      svg.setAttribute('class', ['lucide', 'lucide-' + iconName].concat(extraClasses).join(' '));
 
       if (el.getAttribute('style')) {
         svg.setAttribute('style', el.getAttribute('style'));

@@ -40,6 +40,10 @@ const state = {
   mapLayer: 'station',
   notifFilter: 'all',
   lastUpdatedAt: null,
+  assistantHistory: [],
+  llmConfig: (() => {
+    try { return JSON.parse(localStorage.getItem('wiq-llm-config') || 'null'); } catch { return null; }
+  })(),
 };
 
 // ── Sensor definitions ─────────────────────────────────────
@@ -117,18 +121,46 @@ function clampNum(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
 // ── Theme management ───────────────────────────────────────
 function applyTheme(theme) {
-  document.documentElement.setAttribute('data-theme', theme);
+  const nextTheme = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', nextTheme);
+
   const icon = $('theme-icon');
   if (icon) {
-    icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
-    if (window.lucide) refreshIcons();
+    icon.setAttribute('data-lucide', nextTheme === 'dark' ? 'sun' : 'moon');
+    if (window.lucide && typeof window.lucide.createIcons === 'function' && icon.parentNode) {
+      window.lucide.createIcons({ root: icon.parentNode });
+    } else if (window.lucide) {
+      refreshIcons();
+    }
   }
-  localStorage.setItem('wiq-theme', theme);
-  state.theme = theme;
+
+  const themeBtn = $('theme-toggle');
+  if (themeBtn) {
+    const label = nextTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+    themeBtn.title = label;
+    themeBtn.setAttribute('aria-label', label);
+  }
+
+  const darkToggle = $('dark-toggle');
+  if (darkToggle) {
+    darkToggle.checked = (nextTheme === 'dark');
+  }
+
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeColorMeta) {
+    themeColorMeta.setAttribute('content', nextTheme === 'dark' ? '#070B12' : '#F0F6FF');
+  }
+
+  localStorage.setItem('wiq-theme', nextTheme);
+  state.theme = nextTheme;
+  if (state.aiPrediction) {
+    renderMainTempChart(state.aiPrediction);
+  }
 }
 
 function toggleTheme() {
-  applyTheme(state.theme === 'dark' ? 'light' : 'dark');
+  const current = document.documentElement.getAttribute('data-theme') || state.theme;
+  applyTheme(current === 'dark' ? 'light' : 'dark');
 }
 
 // ── Dynamic weather background ─────────────────────────────
@@ -651,16 +683,20 @@ window.setChartMetric = function (metric) {
     btn.style.color = '';
   });
 
-  if (state.aiPrediction) {
-    renderMainTempChart(state.aiPrediction);
+  const predData = state.aiPrediction || (window.MockData ? MockData.getAIPrediction() : null);
+  if (predData) {
+    renderMainTempChart(predData);
   }
 };
 
 function renderMainTempChart(data) {
   const container = $('main-temp-chart-container');
-  if (!container || !data || !data.hourly) return;
+  if (!container) return;
 
-  const hourly = data.hourly.slice(0, 24);
+  const chartData = data || state.aiPrediction || (window.MockData ? MockData.getAIPrediction() : null);
+  if (!chartData || !chartData.hourly) return;
+
+  const hourly = chartData.hourly.slice(0, 24);
   let values, color, unit;
 
   if (currentChartMetric === 'temperature') {
@@ -668,11 +704,11 @@ function renderMainTempChart(data) {
     color = '#FF8A00';
     unit = '°C';
   } else if (currentChartMetric === 'rain') {
-    values = hourly.map(h => h.rainProbability || 0);
+    values = hourly.map(h => h.rainProbability != null ? h.rainProbability : 0);
     color = '#3B82F6';
     unit = '%';
   } else if (currentChartMetric === 'wind') {
-    values = hourly.map(h => h.windSpeed || 0);
+    values = hourly.map(h => h.windSpeed != null ? h.windSpeed : 0);
     color = '#10B981';
     unit = 'km/h';
   }
@@ -680,14 +716,16 @@ function renderMainTempChart(data) {
   const labels = hourly.map(h => h.time);
   const containerWidth = container.clientWidth || container.parentElement?.clientWidth || 420;
 
-  container.innerHTML = Charts.areaChart(values, labels, {
-    w: Math.max(280, containerWidth - 8),
-    h: 120,
-    color: color,
-    fillFrom: color,
-    unit: unit,
-    showDots: false
-  });
+  if (window.Charts && typeof Charts.areaChart === 'function') {
+    container.innerHTML = Charts.areaChart(values, labels, {
+      w: Math.max(280, containerWidth - 8),
+      h: 150,
+      color: color,
+      fillFrom: color,
+      unit: unit,
+      showDots: true
+    });
+  }
 }
 
 // ── Sensor grid (dashboard) ────────────────────────────────
@@ -2047,6 +2085,42 @@ function renderSettings() {
           </label>
         </div>
       </div>
+      <div class="settings-section">
+        <h3>AI Weather Assistant</h3>
+        <p style="font-size:0.8125rem;color:var(--text-3);margin-bottom:12px">
+          Uses WeatherIQ's local scikit-learn NLU + ML engine by default, or connect a live LLM provider.
+        </p>
+        <div class="settings-row">
+          <div>
+            <div class="sr-label">AI Provider</div>
+            <div class="sr-desc">Auto uses server env keys or local NLU + ML</div>
+          </div>
+          <select class="select-input" id="llm-provider">
+            <option value="auto" ${!state.llmConfig?.provider || state.llmConfig?.provider === 'auto' ? 'selected' : ''}>Auto (Local NLU+ML / Env)</option>
+            <option value="gemini" ${state.llmConfig?.provider === 'gemini' ? 'selected' : ''}>Google Gemini</option>
+            <option value="openai" ${state.llmConfig?.provider === 'openai' ? 'selected' : ''}>OpenAI</option>
+            <option value="groq" ${state.llmConfig?.provider === 'groq' ? 'selected' : ''}>Groq</option>
+            <option value="ollama" ${state.llmConfig?.provider === 'ollama' ? 'selected' : ''}>Ollama (Local)</option>
+          </select>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="sr-label">Model Name</div>
+            <div class="sr-desc">Optional override (e.g. gemini-2.5-flash, gpt-4o-mini)</div>
+          </div>
+          <input type="text" class="select-input" id="llm-model" style="width:170px" placeholder="Default" value="${state.llmConfig?.model || ''}">
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="sr-label">API Key / Ollama URL</div>
+            <div class="sr-desc">Stored locally in browser (leave blank to use .env or local NLU)</div>
+          </div>
+          <input type="password" class="select-input" id="llm-apikey" style="width:170px" placeholder="API key or URL" value="${state.llmConfig?.apiKey || state.llmConfig?.baseUrl || ''}">
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+          <button class="btn-add-location" id="llm-save-btn">Save AI Settings</button>
+        </div>
+      </div>
     </div>
 
     <!-- Tab: Alerts -->
@@ -2214,7 +2288,31 @@ function renderSettings() {
 
   // Dark mode toggle
   const dt = $('dark-toggle');
-  if (dt) dt.addEventListener('change', () => toggleTheme());
+  if (dt) dt.addEventListener('change', () => applyTheme(dt.checked ? 'dark' : 'light'));
+
+  // AI Assistant provider settings
+  const llmSave = $('llm-save-btn');
+  if (llmSave) {
+    llmSave.addEventListener('click', () => {
+      const provider = $('llm-provider')?.value || 'auto';
+      const model = $('llm-model')?.value?.trim() || '';
+      const secretOrUrl = $('llm-apikey')?.value?.trim() || '';
+      const cfg = provider === 'auto'
+        ? null
+        : {
+            provider,
+            model,
+            apiKey: provider === 'ollama' ? '' : secretOrUrl,
+            baseUrl: provider === 'ollama' ? secretOrUrl : '',
+          };
+      state.llmConfig = cfg;
+      if (cfg) localStorage.setItem('wiq-llm-config', JSON.stringify(cfg));
+      else localStorage.removeItem('wiq-llm-config');
+      updateAssistantEngineLabel();
+      llmSave.textContent = '✅ Saved';
+      setTimeout(() => { llmSave.textContent = 'Save AI Settings'; }, 1500);
+    });
+  }
 
   // Demo toggle
   const demoT = $('demo-toggle');
@@ -2355,14 +2453,50 @@ function toggleNotifPanel() {
 }
 
 // ── AI Assistant ───────────────────────────────────────────
+function escapeAssistantHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatAssistantAnswer(text) {
+  return escapeAssistantHtml(text)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+async function updateAssistantEngineLabel() {
+  const lbl = $('assistant-engine-label');
+  if (!lbl) return;
+  if (state.llmConfig && state.llmConfig.provider && state.llmConfig.provider !== 'auto') {
+    const model = state.llmConfig.model || 'default';
+    lbl.textContent = `${state.llmConfig.provider.toUpperCase()} (${model}) • Live IoT`;
+    return;
+  }
+  if (API.getAssistantStatus) {
+    const st = await API.getAssistantStatus();
+    if (st && st.label) {
+      lbl.textContent = `${st.label} • Live IoT`;
+    }
+  }
+}
+
 function setupAssistant() {
   const fab = $('assistant-fab');
   const panel = $('assistant-panel');
   const close = $('assistant-close');
+  const clearBtn = $('assistant-clear');
   const input = $('assistant-input');
   const send = $('assistant-send');
 
   if (!fab) return;
+
+  updateAssistantEngineLabel();
 
   fab.addEventListener('click', () => {
     state.assistantPanelOpen = !state.assistantPanelOpen;
@@ -2375,32 +2509,52 @@ function setupAssistant() {
     panel?.classList.remove('open');
   });
 
-  const handleSend = async () => {
-    const query = input?.value?.trim();
+  if (clearBtn) clearBtn.addEventListener('click', () => {
+    state.assistantHistory = [];
+    const messages = $('assistant-messages');
+    if (messages) {
+      messages.innerHTML = `<div class="assistant-msg bot">Conversation cleared. Ask me anything about live sensor readings, ML forecasts, comfort scores, or station health! 🌦️</div>`;
+    }
+  });
+
+  const submitQuery = async (rawQuery) => {
+    const query = (rawQuery ?? input?.value ?? '').trim();
     if (!query) return;
-    input.value = '';
+    if (input) input.value = '';
     appendAssistantMessage(query, 'user');
-    appendAssistantMessage('Thinking…', 'bot typing');
+    appendAssistantMessage('Analyzing live telemetry & ML models…', 'bot typing');
 
     try {
-      const response = await API.askAssistant(query, state.iotData, state.aiPrediction);
+      const response = await API.askAssistant(query, state.iotData, state.aiPrediction, {
+        history: state.assistantHistory,
+        externalWeather: state.externalWeather,
+        llmConfig: state.llmConfig,
+      });
       removeTypingMessage();
-      appendAssistantBotMessage(response);
+      state.assistantHistory.push({ role: 'user', content: query, topic: response.topic || null });
+      state.assistantHistory.push({ role: 'assistant', content: response.answer, topic: response.topic || null });
+      if (state.assistantHistory.length > 16) {
+        state.assistantHistory = state.assistantHistory.slice(-16);
+      }
+      if (response.engine) {
+        const lbl = $('assistant-engine-label');
+        if (lbl) lbl.textContent = `${response.engine} • Live IoT`;
+      }
+      appendAssistantBotMessage(response, submitQuery);
     } catch {
       removeTypingMessage();
       appendAssistantMessage('Sorry, I couldn\'t process that. Please try again.', 'bot');
     }
   };
 
-  if (send) send.addEventListener('click', handleSend);
-  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') handleSend(); });
+  if (send) send.addEventListener('click', () => submitQuery());
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') submitQuery(); });
 
   // Suggestion chips
   const suggestions = document.querySelectorAll('.suggestion-chip');
   suggestions.forEach(chip => {
     chip.addEventListener('click', () => {
-      if (input) input.value = chip.dataset.query;
-      handleSend();
+      submitQuery(chip.dataset.query);
       state.assistantPanelOpen = true;
       panel?.classList.add('open');
     });
@@ -2418,25 +2572,47 @@ function appendAssistantMessage(text, cls) {
   messages.scrollTop = messages.scrollHeight;
 }
 
-function appendAssistantBotMessage(response) {
+function appendAssistantBotMessage(response, onFollowUp) {
   const messages = $('assistant-messages');
   if (!messages) return;
 
-  const sourceBadgeColors = { 'LIVE IoT': 'background:#10B981;color:white', 'AI PREDICTED': 'background:#8B5CF6;color:white', 'EXTERNAL': 'background:#F59E0B;color:white' };
+  const sourceBadgeColors = {
+    'LIVE IoT': 'background:#10B981;color:white',
+    'AI PREDICTED': 'background:#8B5CF6;color:white',
+    'AI Predicted': 'background:#8B5CF6;color:white',
+    'EXTERNAL': 'background:#F59E0B;color:white',
+    'ANALYTICS': 'background:#0EA5E9;color:white',
+    'FRONTEND CONTEXT': 'background:#64748B;color:white',
+  };
 
   const div = document.createElement('div');
   div.className = 'assistant-msg bot';
+  const engineName = response.engine || 'WeatherIQ NLU + ML';
+
   div.innerHTML = `
-    <div>${response.answer}</div>
+    <div>${formatAssistantAnswer(response.answer)}</div>
     ${response.sources && response.sources.length > 0 ? `
     <div class="assistant-sources">
       ${response.sources.map(s => `
         <div class="assistant-source-item">
-          <span>${s.label}: <strong>${s.value}</strong></span>
-          <span class="assistant-source-badge" style="${sourceBadgeColors[s.source] || 'background:var(--border);color:var(--text-2)'}">${s.source}</span>
+          <span>${escapeAssistantHtml(s.label)}: <strong>${escapeAssistantHtml(s.value)}</strong></span>
+          <span class="assistant-source-badge" style="${sourceBadgeColors[s.source] || 'background:var(--border);color:var(--text-2)'}">${escapeAssistantHtml(s.source)}</span>
         </div>`).join('')}
     </div>` : ''}
-    <div class="assistant-confidence">Confidence: ${response.confidence}%</div>`;
+    <div class="assistant-meta">
+      <span class="assistant-confidence">Confidence: ${Number(response.confidence || 0)}%</span>
+      <span class="assistant-engine-badge">${escapeAssistantHtml(engineName)}</span>
+    </div>
+    ${Array.isArray(response.suggestedFollowUps) && response.suggestedFollowUps.length > 0 ? `
+    <div class="assistant-followups">
+      ${response.suggestedFollowUps.map(q => `<button type="button" class="assistant-followup-chip">${escapeAssistantHtml(q)}</button>`).join('')}
+    </div>` : ''}`;
+
+  if (onFollowUp) {
+    div.querySelectorAll('.assistant-followup-chip').forEach(btn => {
+      btn.addEventListener('click', () => onFollowUp(btn.textContent));
+    });
+  }
 
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
@@ -2824,6 +3000,9 @@ async function init() {
   // Setup Export
   setupExport();
 
+  // Wire up all event listeners immediately so buttons work while data loads
+  setupEventListeners();
+
   // Fetch data in parallel
   await Promise.all([
     loadIoTData(),
@@ -2834,9 +3013,6 @@ async function init() {
 
   // Start background polling
   setupPolling();
-
-  // Wire up all event listeners
-  setupEventListeners();
 
   // Re-render Lucide icons after all dynamic content
   if (window.lucide) refreshIcons();
@@ -3026,9 +3202,10 @@ function preloadCardImages() {
 
 function loadCardBackgroundImage(card, imageUrl) {
   if (!card) return;
+  const overlay = 'linear-gradient(180deg, rgba(15, 23, 42, 0.40) 0%, rgba(15, 23, 42, 0.75) 100%), ';
   const cached = cardImageCache.get(imageUrl);
   if (cached && cached.complete && cached.naturalWidth > 0) {
-    card.style.backgroundImage = `url('${imageUrl}')`;
+    card.style.backgroundImage = `${overlay}url('${imageUrl}')`;
     card.style.backgroundSize = 'cover';
     card.style.backgroundPosition = 'center';
     card.classList.remove('skeleton');
@@ -3039,7 +3216,7 @@ function loadCardBackgroundImage(card, imageUrl) {
   const img = new Image();
   img.onload = () => {
     cardImageCache.set(imageUrl, img);
-    card.style.backgroundImage = `url('${imageUrl}')`;
+    card.style.backgroundImage = `${overlay}url('${imageUrl}')`;
     card.style.backgroundSize = 'cover';
     card.style.backgroundPosition = 'center';
     card.classList.remove('skeleton');
