@@ -3,7 +3,7 @@
 // Caches app shell and provides offline fallback.
 // ============================================================
 
-const CACHE_NAME   = 'weatheriq-v2.6';
+const CACHE_NAME   = 'weatheriq-v2.7';
 const SHELL_ASSETS = [
   './',
   './index.html',
@@ -20,6 +20,14 @@ const SHELL_ASSETS = [
   './images/icons/icon-192.png',
   './images/icons/icon-512.png',
   './images/icons/icon-maskable-512.png',
+  './images/icons/temperature.png',
+  './images/icons/wind_speed.png',
+  './images/icons/rainfall.png',
+  './images/icons/aqi.png',
+  './images/icons/air_quality.png',
+  './images/icons/uv_index.png',
+  './images/icons/air_pressure.png',
+  './images/icons/visibility.png',
   './manifest.json',
 ];
 

@@ -46,16 +46,89 @@ const state = {
   })(),
 };
 
+// ── Measure icon mappings (use images/icons/*.png instead of emojis) ──
+const MEASURE_ICON_FILES = {
+  temperature: 'images/icons/temperature.png',
+  windSpeed:   'images/icons/wind_speed.png',
+  rain:        'images/icons/rainfall.png',
+  aqi:         'images/icons/aqi.png',
+  airQuality:  'images/icons/air_quality.png',
+  uvIndex:     'images/icons/uv_index.png',
+  pressure:    'images/icons/air_pressure.png',
+  visibility:  'images/icons/visibility.png',
+};
+
+const STRICT_MEASURE_EMOJIS = {
+  '🌡️': 'temperature',
+  '🌡': 'temperature',
+  '💧': 'humidity',
+  '💨': 'windSpeed',
+  '🌧️': 'rain',
+  '🌧': 'rain',
+  '🫁': 'aqi',
+  '🌬️': 'pressure',
+  '🌬': 'pressure',
+  '👁️': 'visibility',
+  '👁': 'visibility',
+  '☀️': 'uvIndex',
+  '☀': 'uvIndex',
+};
+
+function resolveMeasureKey(hint, fallbackEmoji = '') {
+  const raw = String(hint || '').trim();
+  const emoji = String(fallbackEmoji || '').trim();
+  const lower = raw.toLowerCase();
+
+  if (MEASURE_ICON_FILES[raw] || raw === 'humidity' || raw === 'sunlight') return raw;
+  if (lower.includes('sunlight') || lower.includes('light sensor')) return 'sunlight';
+  if (lower.includes('uv')) return 'uvIndex';
+  if (lower.includes('dew point') || lower.includes('temperature') || lower.includes('heat') || lower === 'temp') return 'temperature';
+  if (lower.includes('humid')) return 'humidity';
+  if (lower.includes('wind')) return 'windSpeed';
+  if (lower.includes('rain') || lower.includes('precip')) return 'rain';
+  if (lower.includes('air quality')) return 'airQuality';
+  if (lower === 'aqi' || lower.includes('aqi')) return 'aqi';
+  if (lower.includes('pressure') || lower.includes('barometer')) return 'pressure';
+  if (lower.includes('visibility')) return 'visibility';
+
+  if (STRICT_MEASURE_EMOJIS[raw]) return STRICT_MEASURE_EMOJIS[raw];
+  if (emoji && STRICT_MEASURE_EMOJIS[emoji]) {
+    if ((emoji === '☀️' || emoji === '☀') && lower && !lower.includes('uv')) return null;
+    return STRICT_MEASURE_EMOJIS[emoji];
+  }
+  if (emoji === '🔥') return 'temperature';
+  if (emoji === '🧴') return 'uvIndex';
+  if (emoji === '😷') return 'airQuality';
+  if (emoji === '🌫️' && lower.includes('visibility')) return 'visibility';
+  return null;
+}
+
+function renderMeasureIcon(hint, fallbackEmoji = '', size = 'sm', alt = '') {
+  const key = resolveMeasureKey(hint, fallbackEmoji);
+  const cls = `measure-icon measure-icon-${size}`;
+  if (key && MEASURE_ICON_FILES[key]) {
+    const safeAlt = String(alt || '').replace(/"/g, '&quot;');
+    return `<img src="${MEASURE_ICON_FILES[key]}" alt="${safeAlt}" class="${cls}" />`;
+  }
+  if (key === 'humidity') {
+    return `<span class="${cls} measure-icon-svg measure-humidity" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span>`;
+  }
+  if (key === 'sunlight') {
+    return `<span class="${cls} measure-icon-svg measure-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></span>`;
+  }
+  return fallbackEmoji || hint || '';
+}
+
 // ── Sensor definitions ─────────────────────────────────────
 const SENSORS = [
-  { key: 'temperature', label: 'Temperature', icon: '🌡️', unit: '°C', color: '#EF4444', sparkColor: '#EF4444' },
-  { key: 'humidity', label: 'Humidity', icon: '💧', unit: '%', color: '#3B82F6', sparkColor: '#3B82F6' },
-  { key: 'windSpeed', label: 'Wind Speed', icon: '💨', unit: 'km/h', color: '#6366F1', sparkColor: '#6366F1' },
-  { key: 'rain', label: 'Rainfall', icon: '🌧️', unit: 'mm', color: '#0EA5E9', sparkColor: '#0EA5E9' },
-  { key: 'aqi', label: 'Air Quality', icon: '🫁', unit: 'AQI', color: '#F59E0B', sparkColor: '#F59E0B' },
-  { key: 'uvIndex', label: 'UV Index', icon: '☀️', unit: 'UV', color: '#F97316', sparkColor: '#F97316' },
-  { key: 'pressure', label: 'Pressure', icon: '🌬️', unit: 'hPa', color: '#8B5CF6', sparkColor: '#8B5CF6' },
-  { key: 'visibility', label: 'Visibility', icon: '👁️', unit: 'km', color: '#10B981', sparkColor: '#10B981' },
+  { key: 'temperature', label: 'Temperature', icon: renderMeasureIcon('temperature', '', 'lg'), unit: '°C', color: '#EF4444', sparkColor: '#EF4444' },
+  { key: 'humidity', label: 'Humidity', icon: renderMeasureIcon('humidity', '', 'lg'), unit: '%', color: '#3B82F6', sparkColor: '#3B82F6' },
+  { key: 'windSpeed', label: 'Wind Speed', icon: renderMeasureIcon('windSpeed', '', 'lg'), unit: 'km/h', color: '#6366F1', sparkColor: '#6366F1' },
+  { key: 'rain', label: 'Rainfall', icon: renderMeasureIcon('rain', '', 'lg'), unit: 'mm', color: '#0EA5E9', sparkColor: '#0EA5E9' },
+  { key: 'aqi', label: 'Air Quality', icon: renderMeasureIcon('aqi', '', 'lg'), unit: 'AQI', color: '#F59E0B', sparkColor: '#F59E0B' },
+  { key: 'uvIndex', label: 'UV Index', icon: renderMeasureIcon('uvIndex', '', 'lg'), unit: 'UV', color: '#F97316', sparkColor: '#F97316' },
+  { key: 'pressure', label: 'Pressure', icon: renderMeasureIcon('pressure', '', 'lg'), unit: 'hPa', color: '#8B5CF6', sparkColor: '#8B5CF6' },
+  { key: 'visibility', label: 'Visibility', icon: renderMeasureIcon('visibility', '', 'lg'), unit: 'km', color: '#10B981', sparkColor: '#10B981' },
 ];
 
 // Source badge helpers
@@ -307,15 +380,15 @@ function renderCurrentWeather(data) {
   const sumEl = $('conditions-summary');
   if (sumEl) {
     const items = [
-      { icon: '🌡️', label: 'Temp', value: `${c.temperature}°C`, source: 'IoT' },
-      { icon: '💧', label: 'Humidity', value: `${c.humidity}%`, source: 'IoT' },
-      { icon: '🫁', label: 'AQI', value: `${c.aqi}`, source: 'IoT' },
-      { icon: '☀️', label: 'UV', value: `${c.uvIndex}`, source: 'IoT' },
-      { icon: '🌬️', label: 'Pressure', value: `${c.pressure} hPa`, source: 'IoT' },
-      { icon: '💨', label: 'Wind', value: `${c.windSpeed} km/h`, source: 'IoT' },
-      { icon: '🌧️', label: 'Rain %', value: `${c.rainProbability || 0}%`, source: 'AI' },
-      { icon: '👁️', label: 'Visibility', value: `${c.visibility} km`, source: 'IoT' },
-      { icon: '🌡️', label: 'Dew Point', value: `${c.dewPoint || '—'}°C`, source: 'IoT' },
+      { icon: renderMeasureIcon('temperature', '', 'sm'), label: 'Temp', value: `${c.temperature}°C`, source: 'IoT' },
+      { icon: renderMeasureIcon('humidity', '', 'sm'), label: 'Humidity', value: `${c.humidity}%`, source: 'IoT' },
+      { icon: renderMeasureIcon('aqi', '', 'sm'), label: 'AQI', value: `${c.aqi}`, source: 'IoT' },
+      { icon: renderMeasureIcon('uvIndex', '', 'sm'), label: 'UV', value: `${c.uvIndex}`, source: 'IoT' },
+      { icon: renderMeasureIcon('pressure', '', 'sm'), label: 'Pressure', value: `${c.pressure} hPa`, source: 'IoT' },
+      { icon: renderMeasureIcon('windSpeed', '', 'sm'), label: 'Wind', value: `${c.windSpeed} km/h`, source: 'IoT' },
+      { icon: renderMeasureIcon('rain', '', 'sm'), label: 'Rain %', value: `${c.rainProbability || 0}%`, source: 'AI' },
+      { icon: renderMeasureIcon('visibility', '', 'sm'), label: 'Visibility', value: `${c.visibility} km`, source: 'IoT' },
+      { icon: renderMeasureIcon('dewPoint', '', 'sm'), label: 'Dew Point', value: `${c.dewPoint || '—'}°C`, source: 'IoT' },
       { icon: '⬆️', label: 'Trend', value: c.pressureTrend || '—', source: 'IoT' },
     ];
     sumEl.innerHTML = items.slice(0, 5).map(it => `
@@ -416,7 +489,7 @@ async function renderWeatherScore(iotData) {
       const barColor = f.value >= 70 ? '#10B981' : f.value >= 50 ? '#3B82F6' : f.value >= 30 ? '#F59E0B' : '#EF4444';
       return `
               <div class="ws-factor">
-                <div class="ws-factor-name">${f.icon} ${f.name}</div>
+                <div class="ws-factor-name">${renderMeasureIcon(f.name, f.icon, 'xs')} ${f.name}</div>
                 <div>${Charts.scoreBar(f.value, 100, { color: barColor, w: 80, h: 6 })}</div>
                 <div class="ws-factor-val">${f.detail}</div>
               </div>`;
@@ -464,7 +537,7 @@ function renderWeatherTimeline(aiPrediction) {
       <div class="timeline-label">${h.isNow ? 'NOW' : '+' + (timeline.indexOf(h)) + 'h'}</div>
       <div class="timeline-icon">${getWeatherIcon(h.condition)}</div>
       <div class="timeline-temp">${h.temperature}°C</div>
-      <div class="timeline-rain">💧 ${h.rainProbability}%</div>
+      <div class="timeline-rain">${renderMeasureIcon('rain', '', 'xs')} ${h.rainProbability}%</div>
       <div class="timeline-wind">${h.windSpeed} km/h</div>
     </div>`).join('');
 }
@@ -730,17 +803,17 @@ function renderMainTempChart(data) {
 
 // ── Sensor grid (dashboard) ────────────────────────────────
 function getSensorValue(data, key) {
-  const c = data.current;
+  const c = data.current || {};
   switch (key) {
-    case 'temperature': return { val: c.temperature, display: `${c.temperature}°C`, trend: getTrend(data.history, 'temperature') };
-    case 'humidity': return { val: c.humidity, display: `${c.humidity}%`, trend: getTrend(data.history, 'humidity') };
-    case 'windSpeed': return { val: c.windSpeed, display: `${c.windSpeed}`, trend: null };
-    case 'rain': return { val: c.rainfallMm, display: c.rain ? `${c.rainfallMm} mm` : 'No Rain', trend: null };
-    case 'aqi': return { val: c.aqi, display: `${c.aqi}`, trend: getTrend(data.history, 'aqi') };
-    case 'uvIndex': return { val: c.uvIndex, display: `${c.uvIndex}`, trend: null };
-    case 'pressure': return { val: c.pressure, display: `${c.pressure}`, trend: c.pressureTrend };
-    case 'visibility': return { val: c.visibility, display: `${c.visibility}`, trend: null };
-    default: return { val: 0, display: '—', trend: null };
+    case 'temperature': return { val: c.temperature, display: c.temperature != null ? `${c.temperature}°C` : 'N/A', trend: getTrend(data.history, 'temperature') };
+    case 'humidity': return { val: c.humidity, display: c.humidity != null ? `${c.humidity}%` : 'N/A', trend: getTrend(data.history, 'humidity') };
+    case 'windSpeed': return { val: c.windSpeed, display: c.windSpeed != null ? `${c.windSpeed}` : 'N/A', trend: null };
+    case 'rain': return { val: c.rainfallMm ?? 0, display: c.rain ? `${c.rainfallMm ?? 0} mm` : (c.rainStatus || 'No Rain'), trend: null };
+    case 'aqi': return { val: c.aqi, display: c.aqi != null ? `${c.aqi}` : 'N/A', trend: getTrend(data.history, 'aqi') };
+    case 'uvIndex': return { val: c.uvIndex, display: c.uvIndex != null ? `${c.uvIndex}` : 'N/A', trend: null };
+    case 'pressure': return { val: c.pressure, display: c.pressure != null ? `${c.pressure}` : 'N/A', trend: c.pressureTrend };
+    case 'visibility': return { val: c.visibility, display: c.visibility != null ? `${c.visibility}` : 'N/A', trend: null };
+    default: return { val: null, display: '—', trend: null };
   }
 }
 
@@ -755,6 +828,7 @@ function getTrend(history, key) {
 }
 
 function getSensorStatus(key, val) {
+  if (val == null) return { cls: 'moderate', label: 'N/A' };
   switch (key) {
     case 'aqi':
       if (val <= 50) return { cls: 'good', label: 'Good' };
@@ -817,7 +891,7 @@ function renderSensorGrid(data) {
         </div>
         <div class="sc-label">${sensor.label}</div>
         <div class="sc-value" aria-live="polite">
-          ${display.includes('°') || display.includes('%') || display.includes('km') || display.includes('hPa')
+          ${display === 'N/A' || display === '—' || display.includes('°') || display.includes('%') || display.includes('km') || display.includes('hPa') || display.includes('Rain')
         ? display
         : `${display}<span class="sc-unit">${sensor.unit}</span>`}
         </div>
@@ -887,7 +961,7 @@ function renderRecommendations(iotData) {
 
   list.innerHTML = recs.slice(0, 4).map(r => `
     <div class="reco-item type-${r.type}" role="listitem">
-      <span class="reco-icon" aria-hidden="true">${r.icon}</span>
+      <span class="reco-icon" aria-hidden="true">${renderMeasureIcon(r.title, r.icon, 'sm')}</span>
       <div>
         <div class="reco-title">${r.title}</div>
         <div class="reco-message">${r.message}</div>
@@ -929,7 +1003,7 @@ function renderSafetyAlerts(iotData) {
 
   container.innerHTML = alerts.map(a => `
     <div class="safety-alert level-${a.level}" role="alert">
-      <div class="alert-icon" aria-hidden="true">${a.icon}</div>
+      <div class="alert-icon" aria-hidden="true">${renderMeasureIcon(a.title, a.icon, 'md')}</div>
       <div class="alert-body">
         <div class="alert-title">${a.title}</div>
         <div class="alert-desc">${a.description}</div>
@@ -1131,7 +1205,7 @@ async function renderDeviceHealth(iotData) {
       const statusLabel = !s.online ? 'Offline' : minsSince > 5 ? 'Stale' : 'Live';
       return `
           <div class="sensor-health-item">
-            <div class="shi-icon">${s.icon}</div>
+            <div class="shi-icon">${renderMeasureIcon(s.id || s.name, s.icon, 'sm')}</div>
             <div class="shi-info">
               <div class="shi-name">${s.name}</div>
               <div class="shi-val">${s.value} · ${statusLabel} · ${minsSince < 1 ? 'now' : minsSince + 'm ago'}</div>
@@ -1170,7 +1244,7 @@ async function renderAnomalyDetection(iotData) {
       <div class="anomaly-list">
         ${anomalies.map(a => `
           <div class="anomaly-card severity-${a.severity}">
-            <div class="anomaly-icon">${a.icon}</div>
+            <div class="anomaly-icon">${renderMeasureIcon(a.type || a.title, a.icon, 'md')}</div>
             <div class="anomaly-body">
               <div class="anomaly-title">${a.title}</div>
               <div class="anomaly-detail">
@@ -1288,6 +1362,17 @@ async function loadAndRenderModelPerformance() {
   try {
     const perf = state.modelPerformance || await API.getModelPerformance();
     state.modelPerformance = perf;
+
+    if (!perf || perf.error || !perf.model) {
+      if (badge) {
+        badge.className = 'model-status-badge warning';
+        badge.textContent = '⚠ Unavailable';
+      }
+      grid.innerHTML = `<p class="metric-na">${perf?.error || 'Model performance data unavailable.'}</p>`;
+      if (metrics) metrics.innerHTML = '';
+      return;
+    }
+
     const m = perf.model;
 
     if (badge) {
@@ -1330,11 +1415,11 @@ async function loadAndRenderModelPerformance() {
           </div>
           <div>
             <h4 style="font-size:0.8125rem;color:var(--text-3);margin-bottom:10px">AQI Model</h4>
-            <div class="metric-na" style="padding:12px 0;font-size:0.8125rem">⚠ Not available yet<br><span style="font-size:0.75rem">Requires additional sensor calibration data.</span></div>
+            <div class="metric-na" style="padding:12px 0;font-size:0.8125rem">⚠ Not available yet<br><span style="font-size:0.75rem">${pm.aqi?.reason || 'Requires additional sensor calibration data.'}</span></div>
           </div>
           <div>
             <h4 style="font-size:0.8125rem;color:var(--text-3);margin-bottom:10px">Wind Model</h4>
-            <div class="metric-na" style="padding:12px 0;font-size:0.8125rem">⚠ Not available yet<br><span style="font-size:0.75rem">Wind speed prediction model in development.</span></div>
+            <div class="metric-na" style="padding:12px 0;font-size:0.8125rem">⚠ Not available yet<br><span style="font-size:0.75rem">${pm.wind?.reason || 'Wind speed prediction model in development.'}</span></div>
           </div>
         </div>`;
     }
@@ -1359,17 +1444,25 @@ async function loadAndRenderAIVsActual() {
 
     const result = await API.getAIVsActual(aiPred.hourly, iotData.history);
     state.aiVsActual = result;
-    const s = result.summary;
+
+    if (!result || result.error || !Array.isArray(result.validations) || result.validations.length === 0) {
+      summary.innerHTML = `<p class="metric-na">${result?.error || 'Not enough historical sensor readings for AI validation yet.'}</p>`;
+      if (chartWrap) chartWrap.innerHTML = '';
+      if (tableWrap) tableWrap.innerHTML = '';
+      return;
+    }
+
+    const s = result.summary || {};
 
     if (summary) {
       summary.innerHTML = `
         <div class="model-info-grid">
-          <div class="model-info-stat"><div class="mis-label">Overall Accuracy</div><div class="mis-value" style="color:var(--primary)">${s.overallAccuracy}%</div></div>
-          <div class="model-info-stat"><div class="mis-label">Temp Accuracy</div><div class="mis-value">${s.temperatureAccuracy}%</div></div>
-          <div class="model-info-stat"><div class="mis-label">Humidity Accuracy</div><div class="mis-value">${s.humidityAccuracy}%</div></div>
-          <div class="model-info-stat"><div class="mis-label">Temp MAE</div><div class="mis-value">${s.mae}°C</div></div>
-          <div class="model-info-stat"><div class="mis-label">RMSE</div><div class="mis-value">${s.rmse}°C</div></div>
-          <div class="model-info-stat"><div class="mis-label">Data Points</div><div class="mis-value">${s.dataPoints}</div></div>
+          <div class="model-info-stat"><div class="mis-label">Overall Accuracy</div><div class="mis-value" style="color:var(--primary)">${s.overallAccuracy != null ? s.overallAccuracy + '%' : 'N/A'}</div></div>
+          <div class="model-info-stat"><div class="mis-label">Temp Accuracy</div><div class="mis-value">${s.temperatureAccuracy != null ? s.temperatureAccuracy + '%' : 'N/A'}</div></div>
+          <div class="model-info-stat"><div class="mis-label">Humidity Accuracy</div><div class="mis-value">${s.humidityAccuracy != null ? s.humidityAccuracy + '%' : 'N/A'}</div></div>
+          <div class="model-info-stat"><div class="mis-label">Temp MAE</div><div class="mis-value">${s.mae != null ? s.mae + '°C' : 'N/A'}</div></div>
+          <div class="model-info-stat"><div class="mis-label">RMSE</div><div class="mis-value">${s.rmse != null ? s.rmse + '°C' : 'N/A'}</div></div>
+          <div class="model-info-stat"><div class="mis-label">Data Points</div><div class="mis-value">${s.dataPoints ?? result.validations.length}</div></div>
         </div>`;
     }
 
@@ -1378,7 +1471,7 @@ async function loadAndRenderAIVsActual() {
       const predicted = result.validations.map(v => v.predicted.temperature);
       const actual = result.validations.map(v => v.actual.temperature);
       const labels = result.validations.map(v => v.time);
-      chartWrap.innerHTML = `
+      chartWrap.innerHTML = result.validations.length >= 2 ? `
         <div style="padding:12px;background:var(--surface-2);border-radius:var(--radius-md)">
           ${Charts.multiLineChart([
         { label: 'AI Predicted', values: predicted, color: '#8B5CF6', dashed: true },
@@ -1388,7 +1481,7 @@ async function loadAndRenderAIVsActual() {
             <span style="color:#8B5CF6">— — AI Predicted</span>
             <span style="color:#10B981">—— Actual (IoT)</span>
           </div>
-        </div>`;
+        </div>` : '<p class="metric-na">Need at least 2 validation points to plot chart.</p>';
     }
 
     // Table
@@ -1407,16 +1500,18 @@ async function loadAndRenderAIVsActual() {
           </thead>
           <tbody>
             ${result.validations.map(v => {
-        const tempCls = v.accuracies.temperature >= 90 ? 'good' : v.accuracies.temperature >= 75 ? 'ok' : 'bad';
-        const humCls = v.accuracies.humidity >= 90 ? 'good' : v.accuracies.humidity >= 75 ? 'ok' : 'bad';
+        const tempAcc = v.accuracies?.temperature;
+        const humAcc = v.accuracies?.humidity;
+        const tempCls = tempAcc >= 90 ? 'good' : tempAcc >= 75 ? 'ok' : 'bad';
+        const humCls = humAcc >= 90 ? 'good' : humAcc >= 75 ? 'ok' : 'bad';
         return `
               <tr>
                 <td>${v.time}</td>
-                <td>${v.predicted.temperature}°C</td>
-                <td>${v.actual.temperature}°C</td>
-                <td>${v.errors.temperature}°C</td>
-                <td><span class="acc-chip ${tempCls}">${v.accuracies.temperature}%</span></td>
-                <td><span class="acc-chip ${humCls}">${v.accuracies.humidity}%</span></td>
+                <td>${v.predicted?.temperature != null ? v.predicted.temperature + '°C' : 'N/A'}</td>
+                <td>${v.actual?.temperature != null ? v.actual.temperature + '°C' : 'N/A'}</td>
+                <td>${v.errors?.temperature != null ? v.errors.temperature + '°C' : 'N/A'}</td>
+                <td>${tempAcc != null ? `<span class="acc-chip ${tempCls}">${tempAcc}%</span>` : '<span class="metric-na">N/A</span>'}</td>
+                <td>${humAcc != null ? `<span class="acc-chip ${humCls}">${humAcc}%</span>` : '<span class="metric-na">N/A</span>'}</td>
               </tr>`;
       }).join('')}
           </tbody>
@@ -1450,7 +1545,7 @@ async function loadAndRenderXAI() {
     content.innerHTML = explanations.map(ex => `
       <div style="margin-bottom:20px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-          <span style="font-size:1.4rem">${ex.icon}</span>
+          ${renderMeasureIcon(ex.target, ex.icon, 'md')}
           <div>
             <div style="font-size:0.9375rem;font-weight:700">${ex.target}</div>
             <div style="font-size:0.8125rem;color:var(--text-3)">Predicted: <strong>${ex.value}</strong></div>
@@ -1477,9 +1572,15 @@ async function loadAndRenderXAI() {
 
 function renderModelComparison() {
   const content = $('model-compare-content');
-  if (!content || !state.modelPerformance) return;
+  if (!content || !state.modelPerformance || !Array.isArray(state.modelPerformance.modelComparison)) return;
 
   const models = state.modelPerformance.modelComparison;
+  const trainedDate = state.modelPerformance.model?.trainingDate;
+  const testRecords = state.modelPerformance.model?.testRecords;
+  const caption = trainedDate
+    ? `Comparison evaluated on ${testRecords ? testRecords.toLocaleString() + ' ' : ''}holdout test records (trained ${trainedDate}). Lower MAE/RMSE = better.`
+    : 'Lower MAE/RMSE = better.';
+
   content.innerHTML = `
     <table class="model-compare-table">
       <thead>
@@ -1502,9 +1603,7 @@ function renderModelComparison() {
           </tr>`).join('')}
       </tbody>
     </table>
-    <p style="font-size:0.75rem;color:var(--text-3);margin-top:10px">
-      Comparison based on validation set from July 2026. Lower MAE/RMSE = better.
-    </p>`;
+    <p style="font-size:0.75rem;color:var(--text-3);margin-top:10px">${caption}</p>`;
 }
 
 function renderLocalVsExternal() {
@@ -1513,8 +1612,9 @@ function renderLocalVsExternal() {
 
   const iotData = state.iotData;
   const extData = state.externalWeather;
+  const iotLabel = iotData?.location?.city || state.deviceHealth?.device?.location?.city || 'Local Station';
 
-  const result = MockData.getLocalVsExternal(iotData?.current, extData?.current);
+  const result = API.getLocalVsExternal(iotData?.current, extData?.current, iotLabel);
 
   if (!result.available) {
     content.innerHTML = `
@@ -1528,6 +1628,17 @@ function renderLocalVsExternal() {
     return;
   }
 
+  const fmtVal = (v, unit) => v != null ? `${v}${unit ? ' ' + unit : ''}` : 'N/A';
+  const fmtDiff = (d, unit) => d != null ? `${d > 0 ? '+' : ''}${d}${unit ? ' ' + unit : ''}` : 'N/A';
+
+  const rowsHtml = result.compared.map(row => `
+    <tr>
+      <td>${row.label}</td>
+      <td class="iot-val">${fmtVal(row.iotVal, row.unit)}</td>
+      <td class="ext-val">${fmtVal(row.extVal, row.unit)}</td>
+      <td class="${row.significance === 'significant' ? 'diff-sig' : 'diff-norm'}">${fmtDiff(row.diff, row.unit)}</td>
+    </tr>`).join('');
+
   content.innerHTML = `
     <table class="lve-table">
       <thead>
@@ -1538,23 +1649,14 @@ function renderLocalVsExternal() {
           <th>Difference</th>
         </tr>
       </thead>
-      <tbody>
-        ${result.compared.map(row => `
-          <tr>
-            <td>${row.label}</td>
-            <td class="iot-val">${row.iotVal} ${row.unit}</td>
-            <td class="ext-val">${row.extVal} ${row.unit}</td>
-            <td class="${row.significance === 'significant' ? 'diff-sig' : 'diff-norm'}">
-              ${row.diff > 0 ? '+' : ''}${row.diff} ${row.unit}
-            </td>
-          </tr>`).join('')}
-      </tbody>
+      <tbody>${rowsHtml}</tbody>
     </table>
     <div class="lve-insight">💡 ${result.insight}</div>`;
 
   // Also render on search page
   const searchResult = $('local-vs-ext-search');
   if (searchResult && extData) {
+    show(searchResult);
     searchResult.style.display = '';
     searchResult.innerHTML = `
       <div class="card">
@@ -1565,22 +1667,12 @@ function renderLocalVsExternal() {
           <thead>
             <tr>
               <th>Parameter</th>
-              <th>🏠 Local IoT</th>
+              <th>🏠 ${result.iotLocation}</th>
               <th>🌐 ${result.externalLocation}</th>
               <th>Difference</th>
             </tr>
           </thead>
-          <tbody>
-            ${result.compared.map(row => `
-              <tr>
-                <td>${row.label}</td>
-                <td class="iot-val">${row.iotVal} ${row.unit}</td>
-                <td class="ext-val">${row.extVal} ${row.unit}</td>
-                <td class="${row.significance === 'significant' ? 'diff-sig' : 'diff-norm'}">
-                  ${row.diff > 0 ? '+' : ''}${row.diff} ${row.unit}
-                </td>
-              </tr>`).join('')}
-          </tbody>
+          <tbody>${rowsHtml}</tbody>
         </table>
         <div class="lve-insight">💡 ${result.insight}</div>
       </div>`;
@@ -1611,7 +1703,7 @@ function renderForecastPage() {
                 &nbsp;·&nbsp;
                 <i data-lucide="wind" style="width:12px;height:12px"></i> ${d.wind} km/h
                 &nbsp;·&nbsp;
-                💧 ${d.humidity}% humid
+                ${renderMeasureIcon('humidity', '', 'xs')} ${d.humidity}% humid
               </div>
             </div>
             <span class="fr-temps">${d.high}° <span class="fr-low">/ ${d.low}°</span></span>
@@ -1642,7 +1734,7 @@ function renderIntelligencePage() {
         <div class="reco-list">
           ${recs.map(r => `
             <div class="reco-item type-${r.type}">
-              <span class="reco-icon">${r.icon}</span>
+              <span class="reco-icon">${renderMeasureIcon(r.title, r.icon, 'sm')}</span>
               <div>
                 <div class="reco-title">${r.title}</div>
                 <div class="reco-message">${r.message}</div>
@@ -1671,7 +1763,7 @@ function renderIntelligencePage() {
       ? `<div class="safety-ok"><span class="ok-icon">✅</span><span>No active warnings. All conditions are within safe ranges.</span></div>`
       : alerts.map(a => `
             <div class="safety-alert level-${a.level}">
-              <div class="alert-icon">${a.icon}</div>
+              <div class="alert-icon">${renderMeasureIcon(a.title, a.icon, 'md')}</div>
               <div class="alert-body">
                 <div class="alert-title">${a.title}</div>
                 <div class="alert-desc">${a.description}</div>
@@ -1700,8 +1792,14 @@ async function loadHistoricalData(range) {
     const history = await API.getHistoricalData(range);
     state.historicalData = history;
 
-    const values = history.map(h => h[sensor]).filter(v => v != null);
-    const labels = history.map(h => formatTime(h.timestamp));
+    const validRows = history.filter(h => h[sensor] != null);
+    const values = validRows.map(h => h[sensor]);
+    const labels = validRows.map(h => {
+      if (range === '7d' || range === '30d') {
+        return new Date(h.timestamp).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+      }
+      return formatTime(h.timestamp);
+    });
 
     const sensorDef = SENSORS.find(s => s.key === sensor) || SENSORS[0];
 
@@ -1711,7 +1809,7 @@ async function loadHistoricalData(range) {
       title.textContent = `${sensorName} — ${rangeLabel}`;
     }
 
-    if (chartWrap && values.length > 2) {
+    if (chartWrap && values.length >= 2) {
       chartWrap.innerHTML = `
         <div style="padding:12px;background:var(--surface-2);border-radius:var(--radius-md);overflow:hidden">
           ${Charts.areaChart(values, labels, {
@@ -1726,15 +1824,23 @@ async function loadHistoricalData(range) {
     }
 
     // Stats
-    if (statsRow && values.length) {
-      const min = Math.min(...values).toFixed(1);
-      const max = Math.max(...values).toFixed(1);
-      const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1);
-      statsRow.innerHTML = `
-        <div class="astat"><div class="astat-label">Min</div><div class="astat-value">${min}<span class="astat-unit">${sensorDef.unit}</span></div></div>
-        <div class="astat"><div class="astat-label">Max</div><div class="astat-value">${max}<span class="astat-unit">${sensorDef.unit}</span></div></div>
-        <div class="astat"><div class="astat-label">Average</div><div class="astat-value">${avg}<span class="astat-unit">${sensorDef.unit}</span></div></div>
-        <div class="astat"><div class="astat-label">Readings</div><div class="astat-value">${values.length}</div></div>`;
+    if (statsRow) {
+      if (values.length) {
+        const min = Math.min(...values).toFixed(1);
+        const max = Math.max(...values).toFixed(1);
+        const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(1);
+        statsRow.innerHTML = `
+          <div class="astat"><div class="astat-label">Min</div><div class="astat-value">${min}<span class="astat-unit">${sensorDef.unit}</span></div></div>
+          <div class="astat"><div class="astat-label">Max</div><div class="astat-value">${max}<span class="astat-unit">${sensorDef.unit}</span></div></div>
+          <div class="astat"><div class="astat-label">Average</div><div class="astat-value">${avg}<span class="astat-unit">${sensorDef.unit}</span></div></div>
+          <div class="astat"><div class="astat-label">Readings</div><div class="astat-value">${values.length}</div></div>`;
+      } else {
+        statsRow.innerHTML = `
+          <div class="astat"><div class="astat-label">Min</div><div class="astat-value">—</div></div>
+          <div class="astat"><div class="astat-label">Max</div><div class="astat-value">—</div></div>
+          <div class="astat"><div class="astat-label">Average</div><div class="astat-value">—</div></div>
+          <div class="astat"><div class="astat-label">Readings</div><div class="astat-value">0</div></div>`;
+      }
     }
   } catch {
     if (chartWrap) chartWrap.innerHTML = '<p style="color:var(--text-3);padding:24px;text-align:center">Failed to load historical data.</p>';
@@ -1776,12 +1882,17 @@ function renderMapPage() {
   const stationReadings = $('map-station-readings');
   if (!stationReadings || !state.iotData?.current) return;
 
+  const loc = state.iotData.location;
+  if (loc) {
+    setText('map-station-loc', `${loc.city}${loc.state ? ', ' + loc.state : ''} — ${Number(loc.lat).toFixed(4)}°N ${Number(loc.lng).toFixed(4)}°E`);
+  }
+
   const c = state.iotData.current;
   stationReadings.innerHTML = [
     { label: 'Temperature', value: `${c.temperature}°C` },
     { label: 'Humidity', value: `${c.humidity}%` },
     { label: 'AQI', value: `${c.aqi}` },
-    { label: 'Wind', value: `${c.windSpeed} km/h` },
+    { label: 'Wind', value: c.windSpeed != null ? `${c.windSpeed} km/h` : 'N/A' },
   ].map(r => `
     <div class="sic-reading">
       <div class="sic-reading-label">${r.label}</div>
@@ -2129,7 +2240,7 @@ function renderSettings() {
         <h3>Alert Preferences</h3>
         <div class="alert-pref-item">
           <div class="apref-left">
-            <div class="apref-icon">🌧️</div>
+            <div class="apref-icon">${renderMeasureIcon('rain', '', 'md')}</div>
             <div>
               <div class="apref-label">Rain Alerts</div>
               <div class="apref-desc">Threshold: <input class="threshold-input" id="thresh-rain" type="number" value="${notifSettings.thresholds?.rain || 60}" min="0" max="100">% probability</div>
@@ -2142,7 +2253,7 @@ function renderSettings() {
         </div>
         <div class="alert-pref-item">
           <div class="apref-left">
-            <div class="apref-icon">🫁</div>
+            <div class="apref-icon">${renderMeasureIcon('airQuality', '', 'md')}</div>
             <div>
               <div class="apref-label">Air Quality Alerts</div>
               <div class="apref-desc">Threshold: AQI > <input class="threshold-input" id="thresh-aqi" type="number" value="${notifSettings.thresholds?.aqi || 100}" min="0" max="500"></div>
@@ -2155,7 +2266,7 @@ function renderSettings() {
         </div>
         <div class="alert-pref-item">
           <div class="apref-left">
-            <div class="apref-icon">🌡️</div>
+            <div class="apref-icon">${renderMeasureIcon('temperature', '', 'md')}</div>
             <div>
               <div class="apref-label">High Temperature Alerts</div>
               <div class="apref-desc">Alert when temperature exceeds <input class="threshold-input" id="thresh-temp" type="number" value="${notifSettings.thresholds?.temperatureHigh || 38}" min="20" max="60">°C</div>
@@ -2168,7 +2279,7 @@ function renderSettings() {
         </div>
         <div class="alert-pref-item">
           <div class="apref-left">
-            <div class="apref-icon">☀️</div>
+            <div class="apref-icon">${renderMeasureIcon('uvIndex', '', 'md')}</div>
             <div>
               <div class="apref-label">UV Index Alerts</div>
               <div class="apref-desc">Alert when UV Index exceeds <input class="threshold-input" id="thresh-uv" type="number" value="${notifSettings.thresholds?.uv || 8}" min="0" max="11"></div>
@@ -2248,9 +2359,9 @@ function renderSettings() {
           <div style="font-size:0.875rem;font-weight:600;margin-bottom:8px;color:var(--text-2)">Scenario</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px">
             ${[
-      { key: 'rain_event', label: '🌧️ Rain Event' },
-      { key: 'aqi_spike', label: '🫁 AQI Spike' },
-      { key: 'temp_spike', label: '🌡️ Heat Wave' },
+      { key: 'rain_event', label: `${renderMeasureIcon('rain', '', 'xs')} Rain Event` },
+      { key: 'aqi_spike', label: `${renderMeasureIcon('aqi', '', 'xs')} AQI Spike` },
+      { key: 'temp_spike', label: `${renderMeasureIcon('temperature', '', 'xs')} Heat Wave` },
       { key: 'clear_night', label: '🌙 Clear Night' },
     ].map(s => `
               <button class="trn-btn demo-scenario-btn ${state.demoScenario === s.key ? 'active' : ''}"
@@ -2430,7 +2541,7 @@ function renderNotificationList(notifications) {
 
   list.innerHTML = filtered.map(n => `
     <div class="notif-item ${n.read ? '' : 'unread'}" data-notif-id="${n.id}" role="listitem">
-      <div class="notif-item-icon">${n.icon}</div>
+      <div class="notif-item-icon">${renderMeasureIcon(n.title, n.icon, 'sm')}</div>
       <div class="notif-item-body">
         <div class="notif-item-title">${n.title}</div>
         <div class="notif-item-msg">${n.message}</div>
@@ -3279,7 +3390,10 @@ function updateTomorrowCard(forecastItem) {
     const tempVal = forecastItem.tempHigh != null ? forecastItem.tempHigh : (forecastItem.high != null ? forecastItem.high : forecastItem.temperature);
     if (tempEl && tempVal != null) tempEl.textContent = `${Math.round(tempVal)}°C`;
     const condEl = card.querySelector('.wh-condition');
-    if (condEl && forecastItem.condition) condEl.textContent = forecastItem.condition;
+    if (condEl && forecastItem.condition) {
+      const condKey = forecastItem.condition.toLowerCase();
+      condEl.textContent = (window.WEATHER_CONDITIONS && WEATHER_CONDITIONS[condKey]?.label) || forecastItem.condition;
+    }
   }
 }
 
